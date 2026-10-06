@@ -1,6 +1,8 @@
-# Python and local environments
+# Python bytecode and virtual environment
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 .venv/
 venv/
 env/
@@ -8,23 +10,39 @@ env/
 # Jupyter
 .ipynb_checkpoints/
 
-# Local datasets; retain folder placeholders and data documentation
+# Data files and local outputs
+# Keep raw and processed data local to the machine and not in Git
 /data/raw/*
 !/data/raw/.gitkeep
 /data/processed/*
 !/data/processed/.gitkeep
+/data/splits/
+*.csv
+*.xlsx
+*.xls
+*.zip
+*.parquet
+*.feather
+*.h5
+*.hdf5
 
-# Generated results and model artifacts
-/reports/figures/
-/checkpoints/
-/artifacts/
-*.log
-
-# Local configuration and editor files
-.env
-.env.*
-!.env.example
+# OS and editor files
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+
+# Reports and training artifacts
+reports/figures/*.png
+reports/figures/*.pdf
+reports/figures/*.svg
+*.log
+
+# Model artifacts
+checkpoints/
+artifacts/
+models/
+
+# Environment files
+.env
+.env.*
