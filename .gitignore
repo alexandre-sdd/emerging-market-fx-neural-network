@@ -41,8 +41,13 @@ reports/figures/*.svg
 # Model artifacts
 checkpoints/
 artifacts/
-models/
+/models/
 
 # Environment files
 .env
 .env.*
+
+# Python packaging
+*.egg-info/
+build/
+dist/

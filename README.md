@@ -50,6 +50,7 @@ The planned project workflow is:
 ```text
 .
 ├── README.md
+├── pyproject.toml
 ├── requirements.txt
 ├── .gitignore
 ├── scripts/
@@ -58,9 +59,59 @@ The planned project workflow is:
 │   ├── raw/
 │   ├── processed/
 │   └── README.md
-└── notebooks/
-    └── 01_eda.ipynb
+├── notebooks/
+│   └── 01_eda.ipynb
+└── src/
+    └── fx_forecasting/
+        ├── __init__.py
+        ├── config.py
+        ├── data/
+        │   ├── __init__.py
+        │   ├── download.py
+        │   ├── loaders.py
+        │   └── panel.py
+        ├── features/
+        │   ├── __init__.py
+        │   ├── targets.py
+        │   └── predictors.py
+        ├── models/
+        │   ├── __init__.py
+        │   ├── benchmarks.py
+        │   └── networks.py
+        └── evaluation/
+            ├── __init__.py
+            ├── backtest.py
+            ├── metrics.py
+            └── plots.py
 ```
+
+## Module responsibilities
+
+The package follows the planned research flow:
+
+```text
+BIS exports → data → features → models → evaluation → report
+```
+
+- `config.py` defines paths relative to the checkout, independent of the working directory.
+- `data/` owns acquisition, parsing, alignment, and currency exclusions.
+- `features/` owns targets and predictors, with one common definition for all models.
+- `models/` owns benchmark and neural-network fitting and prediction.
+- `evaluation/` owns time splits, training-window preprocessing, forecast comparisons, and plots.
+- `scripts/` contains thin command entry points; notebooks call package modules for exploration.
+
+The existing download helper lives in `data/download.py`. Other research modules
+contain responsibility docstrings only; their functions and model interfaces will
+be defined during implementation. Imports do not download files or run experiments.
+
+Keep data and feature modules independent of model code. Fit scaling, imputation,
+and other learned transformations within each training window. Share forecast
+origins, observed targets, and inputs across model comparisons. Document currency
+groups and compare credit specifications on common samples.
+
+One small package keeps the team workflow simple. Separate network architectures
+or experiment configuration into additional modules when their implementations
+become large enough to warrant it.
 
 ## Setup
 
@@ -72,6 +123,8 @@ cd emerging-market-fx-neural-network
 ```
 
 ### 2) Create a virtual environment
+
+Use Python 3.10 or newer.
 
 ```bash
 python -m venv .venv
@@ -88,8 +141,12 @@ python -m venv .venv
 ### 3) Install dependencies
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -e .
 ```
+
+The editable installation makes `fx_forecasting` importable in scripts and
+notebooks. Dependencies remain in `requirements.txt`, which supplies the package
+metadata. Select the virtual environment when running notebooks.
 
 ### 4) Download the dataset if it is missing
 
