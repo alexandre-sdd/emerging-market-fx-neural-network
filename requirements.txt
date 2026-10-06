@@ -1,47 +1,5 @@
-# Python bytecode and virtual environment
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-.venv/
-venv/
-env/
-
-# Jupyter
-.ipynb_checkpoints/
-
-# Data files and local outputs
-# Keep raw and processed data local to the machine and not in Git
-/data/
-/data/raw/
-/data/processed/
-/data/splits/
-*.csv
-*.xlsx
-*.xls
-*.zip
-*.parquet
-*.feather
-*.h5
-*.hdf5
-
-# OS and editor files
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
-
-# Reports and training artifacts
-reports/figures/*.png
-reports/figures/*.pdf
-reports/figures/*.svg
-*.log
-
-# Model artifacts
-checkpoints/
-artifacts/
-models/
-
-# Environment files
-.env
-.env.*
+# Initial exploration only; add modeling dependencies when needed.
+numpy
+pandas
+matplotlib
+jupyter

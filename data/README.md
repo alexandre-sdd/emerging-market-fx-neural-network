@@ -1,130 +1,27 @@
-#!/usr/bin/env python3
-"""Download BIS FX and macro data if local copies are missing.
+# Data
 
-This script is intentionally robust and intentionally conservative:
-- it does not assume a single public BIS archive URL;
-- it checks for existing local data before downloading;
-- it supports environment-variable-based URLs for the exact BIS files used in the project.
-- if no local data are present and no URLs are configured, it exits with a clear message.
+No datasets are included. Put original BIS exports in `raw/` and future derived
+panels in `processed/`. Both folders' contents are ignored by Git, except their
+empty `.gitkeep` files. Keep source exports unchanged.
 
-The project expects the following raw files to appear under `data/raw/`:
-- WS_XRU.csv or equivalent
-- WS_EER.csv or equivalent
-- WS_CBPOL.csv or equivalent
-- WS_LONG_CPI.csv or equivalent
-- WS_GLI.csv or equivalent
+## Planned sources
 
-If your institution or course has a preferred BIS mirror, simply set the corresponding
-environment variables before running this script.
-"""
+The coverage below comes from the project brief and has not yet been verified
+against downloaded files. The intended monthly sample is January 1994–August 2026.
 
-from __future__ import annotations
+| BIS dataset | Intended use | Planned coverage |
+| --- | --- | --- |
+| WS_XRU | End-of-month exchange rates against USD; forecast targets | 39 currencies, monthly |
+| WS_EER | Effective exchange rates; real exchange-rate gap and dollar index | 63 economies, monthly |
+| WS_CBPOL | Policy-rate differentials with the US | 34 of the 39 currencies |
+| WS_LONG_CPI | Inflation differentials with the US | 62 economies, monthly |
+| WS_GLI | USD credit to non-banks outside the US and in 12 emerging economies | Quarterly, from 2000 |
 
-import os
-import shutil
-from pathlib import Path
-from typing import Dict
-from urllib.parse import urlparse
-import urllib.request
+When collecting data, record the source, download date, selected series
+identifiers, frequency, units, quotation convention, and available date range
+here. File formats and loaders will be chosen after inspecting the actual exports.
 
-
-ROOT = Path(__file__).resolve().parents[1]
-RAW_DIR = ROOT / "data" / "raw"
-PROCESSED_DIR = ROOT / "data" / "processed"
-
-DATASET_URLS = {
-    "WS_XRU": os.getenv("BIS_WS_XRU_URL"),
-    "WS_EER": os.getenv("BIS_WS_EER_URL"),
-    "WS_CBPOL": os.getenv("BIS_WSCBPOL_URL"),
-    "WS_LONG_CPI": os.getenv("BIS_WS_LONG_CPI_URL"),
-    "WS_GLI": os.getenv("BIS_WS_GLI_URL"),
-}
-
-EXPECTED_FILES = {
-    "WS_XRU": ["WS_XRU.csv", "WS_XRU.xls", "WS_XRU.xlsx", "WS_XRU.txt"],
-    "WS_EER": ["WS_EER.csv", "WS_EER.xls", "WS_EER.xlsx", "WS_EER.txt"],
-    "WS_CBPOL": ["WS_CBPOL.csv", "WS_CBPOL.xls", "WS_CBPOL.xlsx", "WS_CBPOL.txt"],
-    "WS_LONG_CPI": ["WS_LONG_CPI.csv", "WS_LONG_CPI.xls", "WS_LONG_CPI.xlsx", "WS_LONG_CPI.txt"],
-    "WS_GLI": ["WS_GLI.csv", "WS_GLI.xls", "WS_GLI.xlsx", "WS_GLI.txt"],
-}
-
-
-def ensure_directories() -> None:
-    RAW_DIR.mkdir(parents=True, exist_ok=True)
-    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-
-
-def has_local_file(dataset_name: str) -> Path | None:
-    for filename in EXPECTED_FILES.get(dataset_name, []):
-        candidate = RAW_DIR / filename
-        if candidate.exists():
-            return candidate
-    return None
-
-
-def safe_download(url: str, destination: Path) -> None:
-    if not url:
-        raise ValueError("Empty URL provided")
-
-    parsed = urlparse(url)
-    if not parsed.scheme or not parsed.netloc:
-        raise ValueError(f"Invalid URL: {url}")
-
-    print(f"Downloading {url} -> {destination}")
-    urllib.request.urlretrieve(url, destination)
-
-
-def try_download_missing_data() -> None:
-    missing = []
-
-    for dataset_name, url in DATASET_URLS.items():
-        if has_local_file(dataset_name):
-            print(f"Found local copy for {dataset_name}: {has_local_file(dataset_name)}")
-            continue
-
-        if not url:
-            missing.append(dataset_name)
-            continue
-
-        destination = RAW_DIR / (dataset_name + ".downloaded")
-        try:
-            safe_download(url, destination)
-            print(f"Saved downloaded file to {destination}")
-           
-            # Try to move the downloaded file to a canonical name if possible.
-            if destination.exists():
-                canonical_name = destination.with_name(dataset_name + ".csv")
-                if canonical_name.exists():
-                    canonical_name.unlink()
-                shutil.move(str(destination), str(canonical_name))
-                print(f"Normalized data file name to {canonical_name}")
-        except Exception as exc:
-            print(f"Failed to download {dataset_name} from configured URL: {exc}")
-            missing.append(dataset_name)
-
-    if missing:
-        print("\nMissing data files: " + ", ".join(missing))
-        print("\nNo local copies were found and no valid download URLs were configured.")
-        print("Set one or more of the following environment variables before running the script:")
-        print("  BIS_WS_XRU_URL")
-        print("  BIS_WS_EER_URL")
-        print("  BIS_WSCBPOL_URL")
-        print("  BIS_WS_LONG_CPI_URL")
-        print("  BIS_WS_GLI_URL")
-        print("\nExample:")
-        print("  export BIS_WS_XRU_URL='https://example.com/WS_XRU.csv'")
-        print("  python scripts/download_data.py")
-        print("\nThe script will then place the downloaded files under data/raw/ automatically.")
-    else:
-        print("\nAll configured datasets are present or successfully downloaded.")
-
-
-def main() -> None:
-    ensure_directories()
-    print(f"Checking for project data in: {RAW_DIR}")
-    try_download_missing_data()
-
-
-if __name__ == "__main__":
-    main()
-
+Before building the panel, document the currency list and classification,
+peg exclusions, missing-data treatment, and quarterly-to-monthly alignment.
+Dollar credit should enter with a two-quarter lag. Check publication timing for
+all predictors and document any limitations from using revised historical data.
