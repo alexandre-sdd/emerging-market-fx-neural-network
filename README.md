@@ -11,8 +11,14 @@ The project tests three model designs on the same input set:
 
 The main empirical question is whether any of these models beats the random walk benchmark, especially for emerging-market currencies and at longer horizons, and whether the stock of dollar credit outside the United States adds predictive power.
 
-This repository is a starting scaffold. The exploration notebook is an outline;
-feature engineering, models, and evaluation are not implemented.
+Data acquisition, ingestion, and the initial exploration notebook are implemented. The
+basic EDA reviews missing values, duplicates, coverage, ranges, and time paths.
+Feature engineering, models, and evaluation are not implemented.
+
+The brief's 39-currency roster is not specified. The initial review covers the
+downloaded BIS universe and records currency/economy overlaps without selecting
+the final model sample. Current exports contain 64 broad EER economies and 63
+CPI economies; the source counts below are the original project brief.
 
 ## Data sources
 
@@ -54,9 +60,12 @@ The planned project workflow is:
 ├── requirements.txt
 ├── .gitignore
 ├── scripts/
-│   └── download_data.py
+│   ├── download_data.py
+│   ├── process_data.py
+│   └── run_eda.py
 ├── data/
 │   ├── raw/
+│   ├── ingested/
 │   ├── processed/
 │   └── README.md
 ├── notebooks/
@@ -69,6 +78,8 @@ The planned project workflow is:
         │   ├── __init__.py
         │   ├── download.py
         │   ├── loaders.py
+        │   ├── ingest.py
+        │   ├── eda.py
         │   └── panel.py
         ├── features/
         │   ├── __init__.py
@@ -90,7 +101,7 @@ The planned project workflow is:
 The package follows the planned research flow:
 
 ```text
-BIS exports → data → features → models → evaluation → report
+BIS exports → ingestion → features → models → evaluation → report
 ```
 
 - `config.py` defines paths relative to the checkout, independent of the working directory.
@@ -100,9 +111,11 @@ BIS exports → data → features → models → evaluation → report
 - `evaluation/` owns time splits, training-window preprocessing, forecast comparisons, and plots.
 - `scripts/` contains thin command entry points; notebooks call package modules for exploration.
 
-The existing download helper lives in `data/download.py`. Other research modules
-contain responsibility docstrings only; their functions and model interfaces will
-be defined during implementation. Imports do not download files or run experiments.
+The download helper lives in `data/download.py`; `data/loaders.py` parses the
+native exports, `data/ingest.py` creates typed observation and series tables,
+and `data/eda.py` generates the separate initial review. Ingestion does not call
+EDA or feature modules. Other research modules contain responsibility docstrings
+only. Imports do not download files or run experiments.
 
 Keep data and feature modules independent of model code. Fit scaling, imputation,
 and other learned transformations within each training window. Share forecast
@@ -154,7 +167,45 @@ metadata. Select the virtual environment when running notebooks.
 python scripts/download_data.py
 ```
 
-The script checks whether the required raw datasets are already present under `data/raw/`. If they are not, it attempts to download them from the configured BIS sources. If the network or registry is unavailable, it exits gracefully and tells you exactly which files are missing.
+The script checks for existing nonempty files under `data/raw/` and downloads
+missing datasets from the official BIS bulk exports. It retains source ZIPs and
+unchanged CSVs, and records URLs, UTC timestamps, SHA-256 hashes, and HTTP metadata
+in `data/raw/download_manifest.json`. Failed downloads do not leave partial CSVs;
+the script exits with a nonzero status if a dataset remains unavailable.
+
+### 5) Ingest the downloaded dataset
+
+```bash
+python scripts/process_data.py
+```
+
+This is a separate local-only step. It selects the documented BIS series and
+normalizes the wide exports into `data/ingested/observations.parquet` and
+`data/ingested/series.parquet`, with a provenance and validation manifest.
+Observations have one row per dataset, series, and native period. Missing values
+remain null, quarterly credit stays quarterly, and values retain their BIS units.
+The monthly calendar defaults to January 1994–August 2026; credit starts in 2000
+and includes only completed quarters within that window. No predictors, forecast
+targets, imputations, merged currency panel, or statistical tests are created.
+
+Use `python scripts/download_data.py --force` to refresh the source snapshot.
+Both scripts accept `--raw-dir`; processing also accepts `--output-dir`,
+`--start YYYY-MM`, and `--end YYYY-MM`. See [data documentation](data/README.md)
+for the ingestion schema and selections.
+
+### 6) Optional: run the initial EDA separately
+
+```bash
+python scripts/run_eda.py
+```
+
+Open `notebooks/01_eda.ipynb` for the executed tables and charts, or read
+[the initial findings](reports/eda/README.md). The script regenerates that report,
+quality tables in `reports/eda/`, figures in `reports/figures/`, and selected
+descriptive matrices with metadata in `data/processed/`. Source files are not
+modified. The analysis uses January 1994–August 2026 for monthly data and
+2000Q1–2026Q2 for expected completed quarterly credit observations. The downloaded
+credit snapshot ends at 2026Q1, so Q2 is recorded as missing.
 
 ## Data download script
 
@@ -162,11 +213,15 @@ The repository includes a download helper that:
 - checks whether data files already exist;
 - downloads missing files into `data/raw/`;
 - normalizes filenames and creates the required local folder structure;
-- keeps raw and processed datasets out of Git via `.gitignore`, while retaining data documentation.
+- keeps raw, ingested, and processed datasets out of Git via `.gitignore`, while retaining data documentation.
 
 ## Notes on the BIS series
 
-These BIS series are not always made available through a single static archive. Depending on the exact download source you use, the script may need the specific BIS file names or a temporary source list. The included helper is designed to be easy to adapt to your course environment or institution's data source.
+Default source archives are listed on [BIS bulk downloads](https://data.bis.org/bulkdownload).
+Override a source with `BIS_WS_XRU_URL`, `BIS_WS_EER_URL`, `BIS_WS_CBPOL_URL`,
+`BIS_WS_LONG_CPI_URL`, or `BIS_WS_GLI_URL` if needed. Ingestion and EDA expect the
+official wide CSV layout with `FREQ` and `Series` metadata. Flat SDMX API exports
+use a different schema and would need a separate parser.
 
 ## References
 

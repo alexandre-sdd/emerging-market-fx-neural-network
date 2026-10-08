@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the existing BIS download helper after installing the project."""
+"""Download original BIS exports only; see process_data.py for ingestion."""
 
 from fx_forecasting.data.download import main
 

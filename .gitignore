@@ -14,6 +14,7 @@ env/
 # Keep raw and processed data local to the machine and not in Git
 /data/raw/*
 !/data/raw/.gitkeep
+/data/ingested/
 /data/processed/*
 !/data/processed/.gitkeep
 /data/splits/
@@ -36,6 +37,7 @@ Thumbs.db
 reports/figures/*.png
 reports/figures/*.pdf
 reports/figures/*.svg
+/reports/eda/
 *.log
 
 # Model artifacts
