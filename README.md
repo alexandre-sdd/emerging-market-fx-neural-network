@@ -17,9 +17,12 @@ Production feature engineering, models, and evaluation are not implemented.
 An additional forecast-oriented EDA report builds explicitly exploratory targets,
 lagged predictors, correlations, and simple benchmark diagnostics.
 
-The brief's 39-currency roster is not specified. The initial review covers the
-downloaded BIS universe and records currency/economy overlaps without selecting
-the final model sample. Current exports contain 64 broad EER economies and 63
+The primary 39-currency roster and data-treatment rules are now selected in
+[the sample decision record](docs/data/sample_and_treatment.md) and
+[the machine-readable specification](config/research_sample.json). The initial
+review covers the wider downloaded BIS universe; the forecasting EDA retains its
+42-currency exploratory comparison. The chosen design has not yet been applied
+to a production panel. Current exports contain 64 broad EER economies and 63
 CPI economies; the source counts below are the original project brief.
 
 ## Data sources
@@ -30,6 +33,26 @@ The project uses BIS monthly or quarterly data series:
 - WS_CBPOL: central bank policy rates for 34 of the 39 currencies
 - WS_LONG_CPI: consumer price indices for 62 economies
 - WS_GLI: global liquidity indicators, including non-US dollar credit to non-banks, quarterly from 2000
+
+## Selected sample and treatment
+
+The primary design uses 39 distinct currencies, with 16 advanced and 23 IMF
+emerging market and developing economies for reporting. AED, HKD and SAR are
+excluded as persistent USD pegs. The documented schedule excludes ARS, CNY and
+MYR peg/transition periods and masks pre-launch EUR, BRL and BAM history. The
+roster and series IDs are fixed without selecting on forecast performance.
+
+Keep the monthly panel unbalanced. Raw data remain unchanged. The selected
+future processing rules allow a flagged one-month causal policy-rate or derived
+inflation carry, leave long/structural gaps explicit, and use training-window-only
+median imputation with missing indicators for optional macro features. Mandatory
+FX/EER inputs and forecast targets are not imputed. Conservative reference-period
+lags define a revised-history pseudo-out-of-sample experiment, not a real-time
+vintage study.
+
+See [the decision record](docs/data/sample_and_treatment.md) for the full roster,
+peg dates and sources, US CPI/Japan treatment, required sensitivity checks and
+implementation boundaries. Production feature and benchmark steps are deferred.
 
 ## Research design
 

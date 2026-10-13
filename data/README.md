@@ -113,18 +113,28 @@ Run `python scripts/run_eda.py` or execute `notebooks/01_eda.ipynb` to regenerat
 the [initial review](../reports/eda/README.md), tables, and charts. EDA output files
 are prefixed `eda_`; they are descriptive matrices, not model-ready panels.
 
-## Sample decisions still open
+## Selected sample and treatment
 
-The exact 39-currency list is absent from the brief. All monthly end-of-period
-FX series are reviewed rather than imposing an arbitrary roster. The current EER
-and CPI universes exceed the brief's 63 and 62 counts. Reference-area overlap is
-in `reports/eda/currency_overlap.csv`.
+The project's primary 39-currency design is now documented in
+[the decision record](../docs/data/sample_and_treatment.md) and
+[research_sample.json](../config/research_sample.json). It selects 39 distinct
+non-USD currencies after excluding AED, HKD and SAR, uses static April 2026 IMF
+groups for reporting, and records peg/transition exclusions and currency starts.
+This is a project choice; the original brief did not supply its own roster.
 
-No missing observations are imputed, no large changes are removed, and no pegs
-are excluded in this EDA. Currency groups, peg dates, shared euro policy-rate
-mapping, and missing-data treatment need explicit definitions before modeling.
-Credit must later enter with a two-quarter lag and a documented monthly
-availability rule. These are revised historical exports, not real-time vintages.
+Ingestion and the saved initial review still cover the wider source universe.
+The earlier 42-currency forecasting EDA also retains its original sample and
+treatment. No selected-sample masks, causal carries or model-domain imputations
+have been applied to raw, ingested or descriptive EDA values in this decision step.
+
+The selected future treatment allows at most a one-month flagged causal carry
+of policy rates or derived annual log inflation. Long and structural gaps remain
+null in the economic panel; optional macro inputs can receive training-window
+median replacements plus missing indicators only when fitting models. Targets,
+FX, REER, NEER and quarterly credit are not filled. The decision record specifies
+reference-period lags, the US CPI fallback, Japan's long gaps, matched-sample
+sensitivities and the two-quarter credit lookup. These revised exports support
+pseudo-out-of-sample analysis; they do not establish real-time vintage availability.
 
 Definitions: [FX](https://data.bis.org/topics/XRU),
 [EER](https://data.bis.org/topics/EER),

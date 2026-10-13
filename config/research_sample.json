@@ -1,0 +1,730 @@
+{
+  "schema_version": 1,
+  "decision_date": "2026-10-13",
+  "status": "selected_primary_design",
+  "implementation_status": "decision_only_no_production_panel_or_features_yet",
+  "monthly_window": {
+    "start": "1994-01",
+    "end": "2026-08"
+  },
+  "universe_rule": "Distinct non-USD currencies with BIS broad REER coverage; euro represented only by XM; exclude AE/HK/SA USD pegs.",
+  "classification": {
+    "source": "imf_groups",
+    "vintage": "April 2026",
+    "time_convention": "Static reporting groups; not a feature or a historical classification.",
+    "em_label": "IMF emerging market and developing economies (EMDE), not an investment-index classification"
+  },
+  "currencies": [
+    {
+      "area": "DZ",
+      "economy": "Algeria",
+      "currency": "DZD",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:DZ:DZD:E",
+        "reer": "M:R:B:DZ",
+        "neer": "M:N:B:DZ",
+        "policy": null,
+        "cpi": "M:DZ:628"
+      }
+    },
+    {
+      "area": "AR",
+      "economy": "Argentina",
+      "currency": "ARS",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:AR:ARS:E",
+        "reer": "M:R:B:AR",
+        "neer": "M:N:B:AR",
+        "policy": "M:AR",
+        "cpi": "M:AR:628"
+      }
+    },
+    {
+      "area": "AU",
+      "economy": "Australia",
+      "currency": "AUD",
+      "group": "advanced",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:AU:AUD:E",
+        "reer": "M:R:B:AU",
+        "neer": "M:N:B:AU",
+        "policy": "M:AU",
+        "cpi": "M:AU:628"
+      }
+    },
+    {
+      "area": "BA",
+      "economy": "Bosnia and Herzegovina",
+      "currency": "BAM",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1998-07",
+      "source_series": {
+        "fx": "M:BA:BAM:E",
+        "reer": "M:R:B:BA",
+        "neer": "M:N:B:BA",
+        "policy": null,
+        "cpi": null
+      }
+    },
+    {
+      "area": "BR",
+      "economy": "Brazil",
+      "currency": "BRL",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-07",
+      "source_series": {
+        "fx": "M:BR:BRL:E",
+        "reer": "M:R:B:BR",
+        "neer": "M:N:B:BR",
+        "policy": "M:BR",
+        "cpi": "M:BR:628"
+      }
+    },
+    {
+      "area": "CA",
+      "economy": "Canada",
+      "currency": "CAD",
+      "group": "advanced",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:CA:CAD:E",
+        "reer": "M:R:B:CA",
+        "neer": "M:N:B:CA",
+        "policy": "M:CA",
+        "cpi": "M:CA:628"
+      }
+    },
+    {
+      "area": "CL",
+      "economy": "Chile",
+      "currency": "CLP",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:CL:CLP:E",
+        "reer": "M:R:B:CL",
+        "neer": "M:N:B:CL",
+        "policy": "M:CL",
+        "cpi": "M:CL:628"
+      }
+    },
+    {
+      "area": "CN",
+      "economy": "China",
+      "currency": "CNY",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:CN:CNY:E",
+        "reer": "M:R:B:CN",
+        "neer": "M:N:B:CN",
+        "policy": "M:CN",
+        "cpi": "M:CN:628"
+      }
+    },
+    {
+      "area": "TW",
+      "economy": "Chinese Taipei",
+      "currency": "TWD",
+      "group": "advanced",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:TW:TWD:E",
+        "reer": "M:R:B:TW",
+        "neer": "M:N:B:TW",
+        "policy": null,
+        "cpi": null
+      }
+    },
+    {
+      "area": "CO",
+      "economy": "Colombia",
+      "currency": "COP",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:CO:COP:E",
+        "reer": "M:R:B:CO",
+        "neer": "M:N:B:CO",
+        "policy": "M:CO",
+        "cpi": "M:CO:628"
+      }
+    },
+    {
+      "area": "CZ",
+      "economy": "Czechia",
+      "currency": "CZK",
+      "group": "advanced",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:CZ:CZK:E",
+        "reer": "M:R:B:CZ",
+        "neer": "M:N:B:CZ",
+        "policy": "M:CZ",
+        "cpi": "M:CZ:628"
+      }
+    },
+    {
+      "area": "DK",
+      "economy": "Denmark",
+      "currency": "DKK",
+      "group": "advanced",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:DK:DKK:E",
+        "reer": "M:R:B:DK",
+        "neer": "M:N:B:DK",
+        "policy": "M:DK",
+        "cpi": "M:DK:628"
+      }
+    },
+    {
+      "area": "XM",
+      "economy": "Euro area",
+      "currency": "EUR",
+      "group": "advanced",
+      "first_eligible_month": "1999-01",
+      "source_series": {
+        "fx": "M:XM:EUR:E",
+        "reer": "M:R:B:XM",
+        "neer": "M:N:B:XM",
+        "policy": "M:XM",
+        "cpi": "M:XM:628"
+      }
+    },
+    {
+      "area": "HU",
+      "economy": "Hungary",
+      "currency": "HUF",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:HU:HUF:E",
+        "reer": "M:R:B:HU",
+        "neer": "M:N:B:HU",
+        "policy": "M:HU",
+        "cpi": "M:HU:628"
+      }
+    },
+    {
+      "area": "IS",
+      "economy": "Iceland",
+      "currency": "ISK",
+      "group": "advanced",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:IS:ISK:E",
+        "reer": "M:R:B:IS",
+        "neer": "M:N:B:IS",
+        "policy": "M:IS",
+        "cpi": "M:IS:628"
+      }
+    },
+    {
+      "area": "IN",
+      "economy": "India",
+      "currency": "INR",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:IN:INR:E",
+        "reer": "M:R:B:IN",
+        "neer": "M:N:B:IN",
+        "policy": "M:IN",
+        "cpi": "M:IN:628"
+      }
+    },
+    {
+      "area": "ID",
+      "economy": "Indonesia",
+      "currency": "IDR",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:ID:IDR:E",
+        "reer": "M:R:B:ID",
+        "neer": "M:N:B:ID",
+        "policy": "M:ID",
+        "cpi": "M:ID:628"
+      }
+    },
+    {
+      "area": "IL",
+      "economy": "Israel",
+      "currency": "ILS",
+      "group": "advanced",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:IL:ILS:E",
+        "reer": "M:R:B:IL",
+        "neer": "M:N:B:IL",
+        "policy": "M:IL",
+        "cpi": "M:IL:628"
+      }
+    },
+    {
+      "area": "JP",
+      "economy": "Japan",
+      "currency": "JPY",
+      "group": "advanced",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:JP:JPY:E",
+        "reer": "M:R:B:JP",
+        "neer": "M:N:B:JP",
+        "policy": "M:JP",
+        "cpi": "M:JP:628"
+      }
+    },
+    {
+      "area": "KR",
+      "economy": "Korea",
+      "currency": "KRW",
+      "group": "advanced",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:KR:KRW:E",
+        "reer": "M:R:B:KR",
+        "neer": "M:N:B:KR",
+        "policy": "M:KR",
+        "cpi": "M:KR:628"
+      }
+    },
+    {
+      "area": "MY",
+      "economy": "Malaysia",
+      "currency": "MYR",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:MY:MYR:E",
+        "reer": "M:R:B:MY",
+        "neer": "M:N:B:MY",
+        "policy": "M:MY",
+        "cpi": "M:MY:628"
+      }
+    },
+    {
+      "area": "MX",
+      "economy": "Mexico",
+      "currency": "MXN",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:MX:MXN:E",
+        "reer": "M:R:B:MX",
+        "neer": "M:N:B:MX",
+        "policy": "M:MX",
+        "cpi": "M:MX:628"
+      }
+    },
+    {
+      "area": "MA",
+      "economy": "Morocco",
+      "currency": "MAD",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:MA:MAD:E",
+        "reer": "M:R:B:MA",
+        "neer": "M:N:B:MA",
+        "policy": "M:MA",
+        "cpi": "M:MA:628"
+      }
+    },
+    {
+      "area": "NZ",
+      "economy": "New Zealand",
+      "currency": "NZD",
+      "group": "advanced",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:NZ:NZD:E",
+        "reer": "M:R:B:NZ",
+        "neer": "M:N:B:NZ",
+        "policy": "M:NZ",
+        "cpi": "M:NZ:628"
+      }
+    },
+    {
+      "area": "MK",
+      "economy": "North Macedonia",
+      "currency": "MKD",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:MK:MKD:E",
+        "reer": "M:R:B:MK",
+        "neer": "M:N:B:MK",
+        "policy": "M:MK",
+        "cpi": "M:MK:628"
+      }
+    },
+    {
+      "area": "NO",
+      "economy": "Norway",
+      "currency": "NOK",
+      "group": "advanced",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:NO:NOK:E",
+        "reer": "M:R:B:NO",
+        "neer": "M:N:B:NO",
+        "policy": "M:NO",
+        "cpi": "M:NO:628"
+      }
+    },
+    {
+      "area": "PE",
+      "economy": "Peru",
+      "currency": "PEN",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:PE:PEN:E",
+        "reer": "M:R:B:PE",
+        "neer": "M:N:B:PE",
+        "policy": "M:PE",
+        "cpi": "M:PE:628"
+      }
+    },
+    {
+      "area": "PH",
+      "economy": "Philippines",
+      "currency": "PHP",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:PH:PHP:E",
+        "reer": "M:R:B:PH",
+        "neer": "M:N:B:PH",
+        "policy": "M:PH",
+        "cpi": "M:PH:628"
+      }
+    },
+    {
+      "area": "PL",
+      "economy": "Poland",
+      "currency": "PLN",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:PL:PLN:E",
+        "reer": "M:R:B:PL",
+        "neer": "M:N:B:PL",
+        "policy": "M:PL",
+        "cpi": "M:PL:628"
+      }
+    },
+    {
+      "area": "RO",
+      "economy": "Romania",
+      "currency": "RON",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:RO:RON:E",
+        "reer": "M:R:B:RO",
+        "neer": "M:N:B:RO",
+        "policy": "M:RO",
+        "cpi": "M:RO:628"
+      }
+    },
+    {
+      "area": "RU",
+      "economy": "Russia",
+      "currency": "RUB",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:RU:RUB:E",
+        "reer": "M:R:B:RU",
+        "neer": "M:N:B:RU",
+        "policy": "M:RU",
+        "cpi": "M:RU:628"
+      }
+    },
+    {
+      "area": "RS",
+      "economy": "Serbia",
+      "currency": "RSD",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:RS:RSD:E",
+        "reer": "M:R:B:RS",
+        "neer": "M:N:B:RS",
+        "policy": "M:RS",
+        "cpi": "M:RS:628"
+      }
+    },
+    {
+      "area": "SG",
+      "economy": "Singapore",
+      "currency": "SGD",
+      "group": "advanced",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:SG:SGD:E",
+        "reer": "M:R:B:SG",
+        "neer": "M:N:B:SG",
+        "policy": null,
+        "cpi": "M:SG:628"
+      }
+    },
+    {
+      "area": "ZA",
+      "economy": "South Africa",
+      "currency": "ZAR",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:ZA:ZAR:E",
+        "reer": "M:R:B:ZA",
+        "neer": "M:N:B:ZA",
+        "policy": "M:ZA",
+        "cpi": "M:ZA:628"
+      }
+    },
+    {
+      "area": "SE",
+      "economy": "Sweden",
+      "currency": "SEK",
+      "group": "advanced",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:SE:SEK:E",
+        "reer": "M:R:B:SE",
+        "neer": "M:N:B:SE",
+        "policy": "M:SE",
+        "cpi": "M:SE:628"
+      }
+    },
+    {
+      "area": "CH",
+      "economy": "Switzerland",
+      "currency": "CHF",
+      "group": "advanced",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:CH:CHF:E",
+        "reer": "M:R:B:CH",
+        "neer": "M:N:B:CH",
+        "policy": "M:CH",
+        "cpi": "M:CH:628"
+      }
+    },
+    {
+      "area": "TH",
+      "economy": "Thailand",
+      "currency": "THB",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:TH:THB:E",
+        "reer": "M:R:B:TH",
+        "neer": "M:N:B:TH",
+        "policy": "M:TH",
+        "cpi": "M:TH:628"
+      }
+    },
+    {
+      "area": "TR",
+      "economy": "Türkiye",
+      "currency": "TRY",
+      "group": "emerging_and_developing",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:TR:TRY:E",
+        "reer": "M:R:B:TR",
+        "neer": "M:N:B:TR",
+        "policy": "M:TR",
+        "cpi": "M:TR:628"
+      }
+    },
+    {
+      "area": "GB",
+      "economy": "United Kingdom",
+      "currency": "GBP",
+      "group": "advanced",
+      "first_eligible_month": "1994-01",
+      "source_series": {
+        "fx": "M:GB:GBP:E",
+        "reer": "M:R:B:GB",
+        "neer": "M:N:B:GB",
+        "policy": "M:GB",
+        "cpi": "M:GB:628"
+      }
+    }
+  ],
+  "excluded_reference_areas": [
+    {
+      "area": "AE",
+      "currency": "AED",
+      "reason": "Persistent de facto USD peg",
+      "sources": [
+        "ae_peg",
+        "ae_history"
+      ]
+    },
+    {
+      "area": "HK",
+      "currency": "HKD",
+      "reason": "USD-linked currency board",
+      "sources": [
+        "hk_peg"
+      ]
+    },
+    {
+      "area": "SA",
+      "currency": "SAR",
+      "reason": "Fixed USD parity",
+      "sources": [
+        "sa_peg"
+      ]
+    }
+  ],
+  "excluded_month_intervals": [
+    {
+      "area": "AR",
+      "start": "1994-01",
+      "end": "2002-01",
+      "reason": "USD convertibility plus January 2002 transition month",
+      "sources": [
+        "argentina_regime"
+      ]
+    },
+    {
+      "area": "CN",
+      "start": "1994-01",
+      "end": "2006-07",
+      "reason": "Conservative pre-reform exclusion, extended through IMF de facto conventional fixed-peg cutoff in July 2006 despite formal July 2005 reform",
+      "sources": [
+        "china_regimes",
+        "china_2005_reform"
+      ]
+    },
+    {
+      "area": "CN",
+      "start": "2008-06",
+      "end": "2010-06",
+      "reason": "IMF stabilized arrangement, including June 2010 transition",
+      "sources": [
+        "china_regimes",
+        "china_2010_reform"
+      ]
+    },
+    {
+      "area": "MY",
+      "start": "1998-09",
+      "end": "2005-07",
+      "reason": "USD peg, including July 2005 transition",
+      "sources": [
+        "malaysia_regimes"
+      ]
+    }
+  ],
+  "regime_rules": {
+    "intervals_inclusive": true,
+    "partial_transition_months": "Exclude whole affected calendar month",
+    "target_eligibility": "Origin and every calendar month through t+h must be observed, positive, and outside excluded FX intervals.",
+    "fx_lag_history": "Reset FX lag and rolling-return histories at currency launch, regime exclusions, or missing FX; do not bridge gaps.",
+    "other_pegs": "Retain EUR-linked and managed/crawling arrangements that can move against USD; sensitivity excludes EUR-linked currencies.",
+    "china_sensitivity": "Alternative formal-policy cutoff: exclude through 2005-07 instead of 2006-07; keep the conservative 2008-06 to 2010-06 exclusion.",
+    "evaluation_scope": "Retrospective non-peg sample restriction; not a claim that future regime changes were known at forecast origin."
+  },
+  "macro_availability": {
+    "forecast_origin": "End of calendar month t",
+    "reference_lags_months": {
+      "fx": 0,
+      "policy": 1,
+      "cpi_inflation": 2,
+      "reer": 2,
+      "usd_neer": 1
+    },
+    "usd_credit_quarter_lag": 2,
+    "usd_credit_series": "Q:USD:3P:N:A:I:B:USD",
+    "credit_mapping": "Quarter containing t minus 2, held fixed within the origin quarter; no interpolation or extra carry.",
+    "vintage_scope": "Latest revised BIS histories with conservative reference-period lags; pseudo out of sample, not real-time vintage evaluation."
+  },
+  "missing_data": {
+    "fx": "No filling. Missing/nonpositive observations invalidate dependent targets and lag histories.",
+    "policy": {
+      "causal_carry_limit_months": 1,
+      "negative_and_zero_rates": "Retain as valid",
+      "long_runs": "Only first missing month may use a flagged carry; subsequent missing months stay null.",
+      "national_euro_histories": "Do not splice; EUR uses XM from 1999; national EUR representatives are absent."
+    },
+    "inflation": {
+      "definition": "100 * log(CPI_t / CPI_(t-12))",
+      "causal_carry_limit_months": 1,
+      "carry_object": "Derived YoY log inflation, never the CPI level",
+      "us_2025_10": "Use September 2025 YoY log inflation as a flagged October fallback; enters December origin under 2m lag.",
+      "future_values": "No backward fill or two-sided interpolation."
+    },
+    "reer_neer": "No filling. Availability lag is applied before feature construction.",
+    "usd_credit": "No filling; native quarterly history and exact lag lookup retained.",
+    "model_domain": {
+      "mandatory_observed": "FX lag/rolling inputs, REER and USD NEER inputs; credit additionally mandatory for matched credit ablations.",
+      "optional_macro_features": "Policy and inflation differentials can remain null in the persisted panel.",
+      "training_imputation": "Training-window-only pooled median plus explicit missing indicators; no median fitted across future origins.",
+      "structural_missing": "Retain currency; preserve never-available flags. Use same origins and treatment for compared models.",
+      "entire_training_feature_missing": "Drop identically for all compared models or fail; never learn replacement from evaluation data.",
+      "sensitivities": [
+        "Strict complete-case macro comparison on matched origins",
+        "Exclude all rows using a causal carry",
+        "Omit optional macro features"
+      ]
+    },
+    "required_flags": [
+      "policy_carried_domestic",
+      "policy_carried_us",
+      "inflation_carried_domestic",
+      "inflation_carried_us",
+      "policy_missing",
+      "inflation_missing",
+      "policy_source_absent",
+      "cpi_source_absent",
+      "fx_regime_excluded"
+    ]
+  },
+  "outliers": {
+    "primary": "Retain observed large moves; log transforms only on positive FX/CPI/EER/credit.",
+    "break_treatment": "Exclude only independently documented unit/source breaks; record rationale. No full-sample threshold trimming."
+  },
+  "evidence": {
+    "source_downloads_utc": [
+      "2026-10-08"
+    ],
+    "ingested_series_sha256": "12ed11c5b0a5221ecff56becccdab3bb36ec5eb140da57089f9e33b9a9f9d0c2",
+    "source_sha256": {
+      "WS_XRU": "8db52e059f7153e2799e98729225876a43424e421587554c5b73610f923e8efd",
+      "WS_EER": "a5ebda204a17f1a403e525dd0a8d6c16241e8cc77f6d93c570c4055779872b16",
+      "WS_CBPOL": "7d0b06d6891d7cfbee61fa5ae8a04ccb1fd5e3a2e9a167183a957a26992ca92a",
+      "WS_LONG_CPI": "f5af23e5d08a24eebe5591f51603c228ea02ea5aa00ecb22611627e4ae5ea885",
+      "WS_GLI": "63bb116cac25adc542f2d4f5949f270e9073729c558053b51d253996882f81ea"
+    }
+  },
+  "references": {
+    "imf_groups": "https://www.imf.org/-/media/files/publications/weo/2026/april/english/statsappendix.pdf",
+    "china_regimes": "https://www.imf.org/-/media/files/publications/wp/2019/wpiea2019050.pdf",
+    "china_2005_reform": "https://wuhan.pbc.gov.cn/en/3688110/3688181/2025112115012569750/index.html",
+    "china_2010_reform": "https://www.pbc.gov.cn/english/130721/2025080815063481973/index.html",
+    "malaysia_regimes": "https://www.bnm.gov.my/web/guest/significant-milestones-in-the-malaysian-foreign-exchange-market",
+    "argentina_regime": "https://www.imf.org/External/NP/ieo/2004/arg/eng/",
+    "hk_peg": "https://www.hkma.gov.hk/eng/key-functions/money/linked-exchange-rate-system/",
+    "sa_peg": "https://sama.gov.sa/en-US/MediaCenter/News/Pages/news-557.aspx",
+    "ae_peg": "https://centralbank.ae/en/our-operations/monetary-policy-and-domestic-markets/domestic-market-operations/",
+    "ae_history": "https://1997-2001.state.gov/issues/economic/trade_reports/neareast96/uae96.html",
+    "eur_launch": "https://www.ecb.europa.eu/press/key/date/1999/html/sp990521.sl.html",
+    "brl_launch": "https://www.bcb.gov.br/controleinflacao/planoreal?modalAberto=30anosreal_noticia4",
+    "bam_launch": "https://www.cbbh.ba/press/ShowNews/1521?lang=en",
+    "dk_eur_peg": "https://www.nationalbanken.dk/en/frequently-asked-questions/questions-regarding-fixed-exchange-rate-policy",
+    "us_cpi_gap": "https://www.bls.gov/cpi/additional-resources/2025-federal-government-shutdown-impact-cpi-faq.htm"
+  }
+}
