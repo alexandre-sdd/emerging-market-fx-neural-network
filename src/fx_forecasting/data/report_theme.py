@@ -23,6 +23,10 @@ RUNTIME = "\nconst report=JSON.parse(document.getElementById('report-data').text
 RUNTIME += '''
 function updateDecision(){const el=document.getElementById('decision-eligibility');el.dataset.selection=['decision-horizon','decision-history'].map(id=>document.getElementById(id).value).join('|');draw(el);}
 ['decision-horizon','decision-history'].forEach(id=>bind(id,updateDecision));
+function updateSelectedSignal(){const el=document.getElementById('selected-signal-chart');el.dataset.selection=['selected-signal-horizon','selected-signal-window','selected-signal-group'].map(id=>document.getElementById(id).value).join('|');draw(el);}
+['selected-signal-horizon','selected-signal-window','selected-signal-group'].forEach(id=>bind(id,updateSelectedSignal));
+bind('selected-baseline-horizon',e=>{const el=document.getElementById('selected-baseline-chart');el.dataset.selection=e.target.value;draw(el);});
+bind('selected-currency',e=>{const el=document.getElementById('selected-currency-chart');el.dataset.selection=e.target.value;draw(el);});
 '''
 
 

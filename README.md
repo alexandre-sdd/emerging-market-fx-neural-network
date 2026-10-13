@@ -252,12 +252,17 @@ Three HTML reports live side by side:
   treatment, why each choice was made, alternatives and unresolved distinctions.
   Expandable explanations and interactive FX-only eligibility counts show the
   costs of regime restrictions, horizon lengths and credit availability. This is
-  a report audit, not a production feature panel or model evaluation.
+  a report audit, not a production feature panel. A selected-39 EDA applies the
+  launch/peg masks, selected causal carries and availability lags to illustrative
+  inputs. It covers EMDE/advanced behaviour, co-movement, predictive correlations
+  at all horizons, stock/growth credit distinctions and FX-only random-walk versus
+  expanding-mean diagnostics. Production benchmarks and neural networks remain deferred.
 
 All three pages share one visual theme and Plotly runtime, lead with the most relevant
 findings, and link evidence to forecasting decisions. Quality tables are copied
 to `reports/eda/quality/`; EDA tables live in `reports/eda/interactive/`;
 decision-audit tables and specification copies live in `reports/eda/decision_assets/`.
+Selected-39 evidence and treatment flags live in `reports/eda/selected_39/`.
 Regenerate only the third report with `python scripts/run_decision_report.py`.
 
 The EDA report embeds Plotly and works offline, with currency, horizon, period and correlation

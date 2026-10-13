@@ -25,7 +25,6 @@ from fx_forecasting.data.eda import (
 from fx_forecasting.data.loaders import load_project_datasets
 from fx_forecasting.data.interactive_report import render_html
 from fx_forecasting.data.quality_report import build_quality_report
-from fx_forecasting.data.decision_report import build_decision_report
 
 PAPER_URL = "https://www.wu.ac.at/fileadmin/wu/d/ri/isk/VSFX_2021/Papers/Rapach_SmartCarry_07-02-2021.pdf"
 FEATURES = {
@@ -204,6 +203,8 @@ def styled(fig, title, ytitle=None, height=420):
 
 
 def build_report(output_dir: Path | None = None) -> Path:
+    from fx_forecasting.data.decision_report import build_decision_report
+
     report_root = Path(output_dir) if output_dir else PROJECT_ROOT / "reports" / "eda"
     output = report_root / "interactive"
     output.mkdir(parents=True, exist_ok=True)
