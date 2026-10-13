@@ -25,6 +25,7 @@ from fx_forecasting.data.eda import (
 from fx_forecasting.data.loaders import load_project_datasets
 from fx_forecasting.data.interactive_report import render_html
 from fx_forecasting.data.quality_report import build_quality_report
+from fx_forecasting.data.decision_report import build_decision_report
 
 PAPER_URL = "https://www.wu.ac.at/fileadmin/wu/d/ri/isk/VSFX_2021/Papers/Rapach_SmartCarry_07-02-2021.pdf"
 FEATURES = {
@@ -208,6 +209,7 @@ def build_report(output_dir: Path | None = None) -> Path:
     output.mkdir(parents=True, exist_ok=True)
     earlier_reports = PROJECT_ROOT / "reports" / "eda"
     build_quality_report(report_root,source_dir=earlier_reports)
+    build_decision_report(report_root)
     datasets = load_project_datasets()
     if any(d.audit["invalid_numeric_tokens"] or d.audit["raw_duplicate_series_rows"] for d in datasets.values()):
         raise ValueError("Resolve invalid tokens or duplicate source series before analysis")

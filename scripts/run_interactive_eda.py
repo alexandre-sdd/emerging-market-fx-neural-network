@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build matching Plotly EDA and quality reports from local BIS evidence."""
+"""Build matching Plotly quality, EDA and research-choice reports from BIS evidence."""
 
 import argparse
 from pathlib import Path

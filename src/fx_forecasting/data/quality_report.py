@@ -14,6 +14,7 @@ import plotly.io as pio
 from plotly.offline import get_plotlyjs
 
 from fx_forecasting.config import PROCESSED_DIR, PROJECT_ROOT
+from fx_forecasting.data.brief_comparison import render_brief_comparison
 from fx_forecasting.data.report_theme import render_document
 
 NAMES={"fx":"Bilateral FX", "reer":"Real effective FX", "neer":"Nominal effective FX",
@@ -38,6 +39,19 @@ def build_quality_report(destination_dir: Path, source_dir: Path | None = None):
           "currency_overlap","shared_currency_codes","largest_fx_changes")
     tables={key:pd.read_csv(source_dir/f"{key}.csv") for key in keys}
     summary=json.loads((source_dir/"summary.json").read_text())
+    choices=json.loads((PROJECT_ROOT/"config"/"research_sample.json").read_text())
+    if choices["evidence"]["source_sha256"] != {key:value["sha256"] for key,value in summary["sources"].items()}:
+        raise ValueError("Research choices and saved quality evidence refer to different source snapshots")
+    for source in (PROJECT_ROOT/"config"/"research_sample.json",
+                   PROJECT_ROOT/"docs"/"data"/"sample_and_treatment.md",
+                   PROJECT_ROOT/"docs"/"project_brief.md"):
+        if source.suffix==".md":
+            portable=source.read_text(encoding="utf-8").replace(
+                "](../../config/research_sample.json)","](research_sample.json)").replace(
+                "](data/sample_and_treatment.md)","](sample_and_treatment.md)")
+            (assets/source.name).write_text(portable,encoding="utf-8")
+        else:
+            shutil.copyfile(source,assets/source.name)
     for key in keys:
         shutil.copyfile(source_dir/f"{key}.csv",assets/f"{key}.csv")
     shutil.copyfile(source_dir/"summary.json",assets/"summary.json")
@@ -133,8 +147,8 @@ def build_quality_report(destination_dir: Path, source_dir: Path | None = None):
         ["USD credit","Outside-US aggregate + 12 countries","Quarterly · 2000Q1–2026Q1 observed","Millions of USD; total credit to non-banks"],
     ],columns=["Source","Reviewed universe","Timing","Definition and units"])
     priorities=pd.DataFrame([
-        ["Currency roster","192 FX areas represent 147 currencies; national EUR histories repeat currency codes.","Confirm 39 currencies, groups and peg schedules before modeling.","data_eda.html#sample"],
-        ["Policy rates",f"{int(policy.internal)} internal missing months; Japan accounts for 116. Most other missingness is at history boundaries.","Choose source mapping and gap treatment; do not carry national euro rates beyond their histories.","data_eda.html#credit-section"],
+        ["Currency roster","192 FX areas represent 147 currencies; a 39-currency design is selected locally.","Reconcile the intended roster and 35-versus-34 policy count with the brief.","#brief-comparison"],
+        ["Policy rates",f"{int(policy.internal)} internal missing months; Japan accounts for 116. Most other missingness is at history boundaries.","Apply the selected short-carry flags and explicit long-gap treatment; avoid national euro splicing.","#brief-comparison"],
         ["US CPI","October 2025 is absent.","Check propagation into YoY inflation and lagged differentials shared by every country.","data_eda.html#credit-section"],
         ["Credit timing","2026Q2 is missing; 2026Q1 is the latest observed quarter.","Use an explicit two-quarter lag and compare credit/no-credit models on common samples.","data_eda.html#credit-section"],
         ["Large FX moves","Extreme changes are present and untrimmed.","Verify source breaks and denomination/regime changes within the selected sample.","data_eda.html#behavior"],
@@ -142,7 +156,8 @@ def build_quality_report(destination_dir: Path, source_dir: Path | None = None):
     ],columns=["Decision","Evidence","Implication","EDA section"])
     decisions='<div class="table-scroll"><table class="data-table decision-table"><thead><tr><th>Decision</th><th>Evidence</th><th>What it means for forecasting</th><th>Follow through</th></tr></thead><tbody>'
     for row in priorities.itertuples(index=False,name=None):
-        decisions+='<tr>'+''.join(f'<td>{html.escape(v)}</td>' for v in row[:3])+f'<td><a href="{row[3]}">EDA ↗</a></td></tr>'
+        label="Discussion ↗" if row[3].startswith("#") else "EDA ↗"
+        decisions+='<tr>'+''.join(f'<td>{html.escape(v)}</td>' for v in row[:3])+f'<td><a href="{row[3]}">{label}</a></td></tr>'
     decisions+='</tbody></table></div>'
     opts=''.join(f'<option value="{key}" {"selected" if key=="policy" else ""}>{name}</option>' for key,name in NAMES.items())
     internal_rows=profiles.loc[profiles.internal_missing.gt(0)].sort_values("internal_missing",ascending=False)
@@ -151,16 +166,17 @@ def build_quality_report(destination_dir: Path, source_dir: Path | None = None):
 <h1>Emerging-market FX.<br><span>Is the data ready?</span></h1>
 <p class="lede">The earlier BIS quality review, organised around the checks that determine whether a forecasting experiment is interpretable.</p>
 <div class="meta">January 1994–August 2026 · BIS snapshot {html.escape(dates)} · earlier evidence preserved · interactive Plotly · works offline</div>
-<div class="report-switch"><a href="data_quality.html" aria-current="page">01 / Data quality</a><a href="data_eda.html">02 / Data EDA →</a></div></header>
-<nav aria-label="Report sections"><a href="#findings">Findings</a><a href="#coverage">Coverage &amp; gaps</a><a href="#audit">Source integrity</a><a href="#mapping">Currency mapping</a><a href="#breaks">Large moves</a><a href="#decisions">Modeling decisions</a><a href="#sources">Sources</a><a href="data_eda.html">Data EDA ↗</a></nav>
-<main><section id="findings"><div class="eyebrow">01 / READINESS</div><h2>The exports parse cleanly; the forecasting panel needs decisions.</h2>
+<div class="report-switch"><a href="data_quality.html" aria-current="page">01 / Data quality</a><a href="data_eda.html">02 / Data EDA</a><a href="research_choices.html">03 / Research choices</a></div></header>
+<nav aria-label="Report sections"><a href="#findings">Findings</a><a href="#brief-comparison">Brief vs data</a><a href="#coverage">Coverage &amp; gaps</a><a href="#audit">Source integrity</a><a href="#mapping">Currency mapping</a><a href="#breaks">Large moves</a><a href="#decisions">Modeling decisions</a><a href="#sources">Sources</a><a href="data_eda.html">Data EDA ↗</a></nav>
+<main><section id="findings"><div class="eyebrow">01 / READINESS</div><h2>The exports parse cleanly; study choices need reconciliation.</h2>
 <p>The five BIS exports provide <b>{total:,}</b> observed values across <b>{int(overview.series.sum())}</b> selected series. This review covers the downloaded universe, rather than the planned 39-currency model sample. Missing data are left explicit; no imputation, clipping, peg exclusions or currency stitching were performed.</p>
 <div class="kpis"><div><strong>{duplicate_rows}</strong><span>duplicate raw rows; {duplicate_ids} duplicate IDs</span></div><div><strong>{policy.missing_pct:.2f}%</strong><span>policy-rate cells missing¹</span></div><div><strong>{internal}</strong><span>internal missing cells across all sources</span></div><div><strong>2026Q1</strong><span>latest observed USD-credit quarter</span></div></div>
 <div class="insights"><article><h3>Policy coverage is the main constraint</h3><p><b>{policy_boundary:.1f}%</b> of missing policy cells occur before or after a history, so the headline missing rate is largely a coverage issue. Japan’s <b>116 internal gaps</b> remain a separate concern for rate-differential features. <a href="#coverage">Inspect dates ↗</a></p></article>
 <article><h3>One US CPI gap affects the panel</h3><p><b>October 2025</b> is missing. It affects inflation changes that use that level and, after lagging, multiple countries’ domestic-minus-US predictors. Complete FX coverage does not guarantee complete macro features. <a href="data_eda.html#credit-section">See feature availability ↗</a></p></article>
 <article><h3>Economies are not distinct currencies</h3><p>The FX export spans <b>192 reference areas</b> and <b>147 currency codes</b>. Shared currency codes and national EUR backcasts require explicit representation choices. Source overlap cannot establish the final 39-currency roster. <a href="#mapping">Inspect mapping ↗</a></p></article>
 <article><h3>Dates do not establish availability</h3><p>Credit is quarterly, macro series have different collection conventions, and the exports contain revised histories. A correct forecasting experiment still needs release rules and lags. <a href="#decisions">Review decisions ↗</a></p></article></div>
-<p class="caption">¹ 4,504 missing policy cells / 19,208 expected cells; denominators include late starts and discontinued histories. Findings are preserved from the 8 October review, with a new presentation.</p></section>
+<p class="caption">¹ 4,504 missing policy cells / 19,208 expected cells; denominators include late starts and discontinued histories. Findings are preserved from the 8 October review, with a new presentation.</p>
+<p><a href="#brief-comparison"><b>Jump to the closing discussion: executive instructions versus findings →</b></a></p></section>
 
 <section id="coverage"><span id="3.-Missing-data-and-date-coverage"></span><div class="eyebrow">02 / COVERAGE &amp; MISSINGNESS</div><h2>Separate unavailable history from gaps inside it.</h2>
 <p>Each monthly series is assessed on the same 392-month calendar. Quarterly credit is assessed on 106 completed quarters, 2000Q1–2026Q2. Late starts, internal gaps and missing tails answer different questions; a trailing gap can reflect discontinued coverage or publication delay.</p>
@@ -185,7 +201,7 @@ def build_quality_report(destination_dir: Path, source_dir: Path | None = None):
 <section id="mapping"><span id="4.-Currency-and-economy-overlaps"></span><div class="eyebrow">04 / UNITS &amp; MAPPING</div><h2>Match definitions before joining country panels.</h2>
 {table(source_defs)}{plot('quality-overlap')}
 <p>These are reference-area matches, rather than complete-history matches. Country USD credit exists for 12 areas; the outside-US aggregate is a separate global variable. A matching economy code does not establish a continuous, timely feature history. There are <b>{shared_currencies}</b> currency codes used by multiple FX reference areas.</p>
-<aside>The EDA uses 42 distinct non-USD currencies with REER coverage, retains euro-area EUR from January 1999 and omits national EUR backcasts. This is a documented exploratory mapping. The final 39 currencies, emerging/advanced groups and time-varying peg exclusions are still open. <a href="data_eda.html#sample">See the EDA sample choices ↗</a></aside>
+<aside>The EDA uses 42 distinct non-USD currencies with REER coverage, retains euro-area EUR from January 1999 and omits national EUR backcasts. The separate primary design selects 39 and records groups and peg exclusions. Its exact correspondence with the executives’ intended roster remains unconfirmed. <a href="#brief-comparison">See the scope comparison and first decisions ↗</a></aside>
 <details><summary>Economy-to-currency mapping and source overlap</summary>{table(overlap,['area','economy','currency','has_reer','has_neer','has_policy','has_cpi','has_usd_credit'])}</details>
 <details><summary>Currency codes shared across reference areas</summary>{table(tables['shared_currency_codes'],['area','economy','currency'])}</details>
 <details><summary>Source ranges and first/last observations</summary>{table(profiles,['dataset','economy','first_in_sample','last_in_sample','min','median','max','units'])}</details>
@@ -198,13 +214,14 @@ def build_quality_report(destination_dir: Path, source_dir: Path | None = None):
 <div class="links">{download('largest_fx_changes')}<a class="download" href="data_eda.html#behavior">Tails and large moves in the exploratory sample ↗</a></div></section>
 
 <section id="decisions"><div class="eyebrow">06 / WHAT MUST BE RESOLVED</div><h2>Define the panel before interpreting model gains.</h2>
-{decisions}<div class="verdict"><strong>Readiness verdict:</strong> the exports support a reproducible descriptive study. The final panel, peg treatment, macro gaps and availability conventions must be resolved before claiming a fair real-time neural-network comparison. <a href="data_eda.html#method">Continue to the model comparison plan →</a></div></section>
+{decisions}<div class="verdict"><strong>Readiness verdict:</strong> the exports support a reproducible descriptive study. Sample and treatment choices are documented; reconciling their correspondence with the executive brief and applying them in production are the next steps. Revised histories and assumed lags support pseudo-out-of-sample analysis, rather than a real-time vintage claim. <a href="#brief-comparison">Review what must be settled first →</a></div></section>
 
 <section id="sources"><div class="eyebrow">07 / PROVENANCE</div><h2>One source snapshot, two complementary reports.</h2>
 <p>This page reads the saved quality tables and descriptive matrices from the earlier BIS review. Restyling does not rerun that analysis or alter its values. The EDA report adds exploratory transformations, future targets, per-currency associations and benchmark diagnostics on a documented provisional sample.</p>
 <p><b>Rebuild both pages:</b> <code>python scripts/run_interactive_eda.py</code>. To refresh the underlying initial quality analysis explicitly, run <code>python scripts/run_eda.py</code> first. Raw exports remain unchanged.</p>
 <div class="links"><a class="download" href="quality/summary.json" download>Earlier selections &amp; source hashes ↗ JSON</a><a class="download" href="data_eda.html">Forecast-oriented data EDA →</a></div>
 <p class="sources">Definitions: <a href="https://data.bis.org/bulkdownload">BIS bulk exports</a> · <a href="https://data.bis.org/topics/XRU">FX</a> · <a href="https://data.bis.org/topics/EER">EER</a> · <a href="https://data.bis.org/topics/CBPOL">Policy rates</a> · <a href="https://data.bis.org/topics/CPI">CPI</a> · <a href="https://data.bis.org/topics/GLI">Global liquidity</a>. The BIS broad USD NEER index is distinct from ICE DXY.</p></section>
+{render_brief_comparison(overview,overlap,choices)}
 </main><footer>EMERGING-MARKET FX NEURAL NETWORK · DATA QUALITY · EARLIER BIS SNAPSHOT</footer>'''
     path=destination_dir/"data_quality.html"
     path.write_text(render_document("Emerging-market FX · Data quality",content,figures,banks,get_plotlyjs()),encoding="utf-8")

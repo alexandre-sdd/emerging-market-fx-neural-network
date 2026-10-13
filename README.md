@@ -238,17 +238,27 @@ credit snapshot ends at 2026Q1, so Q2 is recorded as missing.
 python scripts/run_interactive_eda.py
 ```
 
-Two HTML reports live side by side:
+Three HTML reports live side by side:
 
 - [Data quality](reports/eda/data_quality.html): the earlier review, restyled from
   its saved evidence, with interactive charts for
   coverage, gaps, duplicate/parsing checks, currency mappings and source ranges.
+  A visually distinct closing discussion compares the executive brief with the
+  observed export and selected roster, identifies the first design questions,
+  and separates completed analysis from documented choices and pending work.
 - [Data EDA](reports/eda/data_eda.html): the forecast-oriented Plotly analysis,
   with short quality notes and direct links to the relevant quality sections.
+- [Research choices](reports/eda/research_choices.html): the selected sample and
+  treatment, why each choice was made, alternatives and unresolved distinctions.
+  Expandable explanations and interactive FX-only eligibility counts show the
+  costs of regime restrictions, horizon lengths and credit availability. This is
+  a report audit, not a production feature panel or model evaluation.
 
-Both pages share one visual theme and Plotly runtime, lead with the most relevant
+All three pages share one visual theme and Plotly runtime, lead with the most relevant
 findings, and link evidence to forecasting decisions. Quality tables are copied
-to `reports/eda/quality/`; EDA tables live in `reports/eda/interactive/`.
+to `reports/eda/quality/`; EDA tables live in `reports/eda/interactive/`;
+decision-audit tables and specification copies live in `reports/eda/decision_assets/`.
+Regenerate only the third report with `python scripts/run_decision_report.py`.
 
 The EDA report embeds Plotly and works offline, with currency, horizon, period and correlation
 selectors. Accompanying CSVs expose coverage, sample mapping, tail statistics,
@@ -265,8 +275,9 @@ report; revised historical exports do not establish real-time availability.
 
 The generator is separate from the initial EDA and the production feature/model
 modules. It does not train neural networks or claim statistical significance.
-Use `--output-dir PATH` to write both HTML reports elsewhere, with quality tables
-in `quality/` and EDA tables and provenance in `interactive/`. Regenerating the
+Use `--output-dir PATH` to write all three HTML reports elsewhere, with quality tables
+in `quality/`, EDA tables and provenance in `interactive/`, and decision evidence
+in `decision_assets/`. Regenerating the
 pages reads the saved earlier quality evidence; it does not rerun that analysis.
 Generated results remain outside version control under `reports/eda/` by default.
 
