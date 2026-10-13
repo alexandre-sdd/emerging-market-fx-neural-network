@@ -38,6 +38,7 @@ reports/figures/*.png
 reports/figures/*.pdf
 reports/figures/*.svg
 /reports/eda/
+/reports/progress/
 *.log
 
 # Model artifacts

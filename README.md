@@ -13,7 +13,9 @@ The main empirical question is whether any of these models beats the random walk
 
 Data acquisition, ingestion, and the initial exploration notebook are implemented. The
 basic EDA reviews missing values, duplicates, coverage, ranges, and time paths.
-Feature engineering, models, and evaluation are not implemented.
+Production feature engineering, models, and evaluation are not implemented.
+An additional forecast-oriented EDA report builds explicitly exploratory targets,
+lagged predictors, correlations, and simple benchmark diagnostics.
 
 The brief's 39-currency roster is not specified. The initial review covers the
 downloaded BIS universe and records currency/economy overlaps without selecting
@@ -206,6 +208,50 @@ descriptive matrices with metadata in `data/processed/`. Source files are not
 modified. The analysis uses January 1994–August 2026 for monthly data and
 2000Q1–2026Q2 for expected completed quarterly credit observations. The downloaded
 credit snapshot ends at 2026Q1, so Q2 is recorded as missing.
+
+## Interactive forecast-oriented EDA
+
+```bash
+python scripts/run_interactive_eda.py
+```
+
+Two HTML reports live side by side:
+
+- [Data quality](reports/eda/data_quality.html): the earlier review, restyled from
+  its saved evidence, with interactive charts for
+  coverage, gaps, duplicate/parsing checks, currency mappings and source ranges.
+- [Data EDA](reports/eda/data_eda.html): the forecast-oriented Plotly analysis,
+  with short quality notes and direct links to the relevant quality sections.
+
+Both pages share one visual theme and Plotly runtime, lead with the most relevant
+findings, and link evidence to forecasting decisions. Quality tables are copied
+to `reports/eda/quality/`; EDA tables live in `reports/eda/interactive/`.
+
+The EDA report embeds Plotly and works offline, with currency, horizon, period and correlation
+selectors. Accompanying CSVs expose coverage, sample mapping, tail statistics,
+per-currency predictive correlations, stress-conditioned relationships, feature
+availability, and random-walk / expanding historical-mean forecast metrics.
+
+The report follows the questions raised by the July 2, 2021 working-paper version
+of Filippou, Rapach, Taylor and Zhou. It covers 42 distinct non-USD currencies with
+broad REER data, uses the euro-area EUR representative from 1999, and omits
+national EUR backcasts. This exploratory universe is not the final 39-currency
+roster. Pegs are flagged but retained, and no emerging/advanced grouping is assumed.
+Feature definitions and conservative timing assumptions are documented in the
+report; revised historical exports do not establish real-time availability.
+
+The generator is separate from the initial EDA and the production feature/model
+modules. It does not train neural networks or claim statistical significance.
+Use `--output-dir PATH` to write both HTML reports elsewhere, with quality tables
+in `quality/` and EDA tables and provenance in `interactive/`. Regenerating the
+pages reads the saved earlier quality evidence; it does not rerun that analysis.
+Generated results remain outside version control under `reports/eda/` by default.
+
+All report outputs are grouped under `reports/`: EDA reports and tables in
+`eda/`, exported charts in `figures/`, and weekly PDF reports in `progress/`.
+The [8 October progress report](reports/progress/weekly_progress_report_2026-10-08.pdf)
+is stored alongside the other report outputs. Generated progress PDFs are also
+excluded from version control.
 
 ## Data download script
 
