@@ -39,6 +39,7 @@ reports/figures/*.pdf
 reports/figures/*.svg
 /reports/eda/
 /reports/progress/
+/reports/clustering/
 *.log
 
 # Model artifacts

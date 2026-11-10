@@ -13,7 +13,8 @@ The main empirical question is whether any of these models beats the random walk
 
 Data acquisition, ingestion, and the initial exploration notebook are implemented. The
 basic EDA reviews missing values, duplicates, coverage, ranges, and time paths.
-Production feature engineering, models, and evaluation are not implemented.
+Causal FX/macro features and joint sequence exports are implemented for the
+clustering handoff below. Neural forecasting models have not been trained.
 An additional forecast-oriented EDA report builds explicitly exploratory targets,
 lagged predictors, correlations, and simple benchmark diagnostics.
 
@@ -21,8 +22,8 @@ The primary 39-currency roster and data-treatment rules are now selected in
 [the sample decision record](docs/data/sample_and_treatment.md) and
 [the machine-readable specification](config/research_sample.json). The initial
 review covers the wider downloaded BIS universe; the forecasting EDA retains its
-42-currency exploratory comparison. The chosen design has not yet been applied
-to a production panel. Current exports contain 64 broad EER economies and 63
+42-currency exploratory comparison. The joint handoff now applies the selected
+design to a causal FX/macro panel. Current exports contain 64 broad EER economies and 63
 CPI economies; the source counts below are the original project brief.
 
 ## Data sources
@@ -52,7 +53,8 @@ vintage study.
 
 See [the decision record](docs/data/sample_and_treatment.md) for the full roster,
 peg dates and sources, US CPI/Japan treatment, required sensitivity checks and
-implementation boundaries. Production feature and benchmark steps are deferred.
+implementation boundaries. The handoff applies these data rules; production
+forecasting model and benchmark comparisons remain separate.
 
 ## Research design
 
@@ -139,8 +141,9 @@ BIS exports → ingestion → features → models → evaluation → report
 The download helper lives in `data/download.py`; `data/loaders.py` parses the
 native exports, `data/ingest.py` creates typed observation and series tables,
 and `data/eda.py` generates the separate initial review. Ingestion does not call
-EDA or feature modules. Other research modules contain responsibility docstrings
-only. Imports do not download files or run experiments.
+EDA or feature modules. The canonical panel and joint dataset builder now serve
+the clustering handoff; forecasting model modules remain scaffolds. Imports do not download
+files or run experiments.
 
 Keep data and feature modules independent of model code. Fit scaling, imputation,
 and other learned transformations within each training window. Share forecast
@@ -275,6 +278,165 @@ All report outputs are grouped under `reports/`: EDA reports and tables in
 The [8 October progress report](reports/progress/weekly_progress_report_2026-10-08.pdf)
 is stored alongside the other report outputs. Generated progress PDFs are also
 excluded from version control.
+
+## Currency clustering for pooled training
+
+Open [the currency-clustering notebook](notebooks/02_currency_clustering.ipynb)
+to group currencies by constrained DTW similarity and assemble candidate training
+batches. Install its optional dependency with `python -m pip install -e ".[clustering]"`.
+It runs from either the repository root or `notebooks/` and reads the existing
+ingested snapshot without downloading data or depending on another notebook's state.
+
+The default fit window is January 2011–December 2019. Exact configured source IDs,
+currency starts and peg exclusions apply before returns are constructed. Only
+currencies with complete, nonconstant returns throughout that shared calendar
+enter clustering; exclusions are reported. Standardized monthly log returns
+are clustered using constrained DTW. Silhouette and inertia plots guide
+an explicit choice of K explained in Markdown. Short sensitivity calculations
+compare seeds, historical windows, Euclidean distance and retained return magnitude.
+The notebook keeps the calculations in short cells and the checks and interpretation
+in Markdown, without separate clustering helper or test modules.
+
+Exports under `reports/clustering/` include membership and coverage tables,
+model-selection diagnostics, run settings, and `pooled_training.parquet`.
+The notebook also plots a two-dimensional MDS map of the DTW distances and saves
+PNG/SVG maps, an offline interactive HTML map, and cluster return-history plots.
+The pooled training table keeps separate currency-month observations, a common FX-only predictor
+schema, and original 1-, 3- and 12-month targets realised by the fit cutoff.
+It demonstrates how to batch data; it does not replace the production macro panel.
+These group labels can support forecasts after December 2019 and must not be
+backfilled into the planned January 2010 evaluation. Later forecast comparisons
+must refit grouping within the corresponding historical information set.
+
+For a concise presentation page, run `python scripts/run_cluster_summary.py`.
+Open `reports/clustering/cluster_summary.html` for the K comparison, interactive
+cluster map and combined return histories, with brief interpretations. The page
+uses the notebook's saved results and works offline as a single HTML file.
+
+[The correlation-clustering notebook](notebooks/03_currency_correlation_clustering.ipynb)
+compares contemporaneous return correlation with normalized FX-level correlation
+on the same dates and currencies. It uses average-linkage hierarchies, silhouette
+and dendrograms, with the interpretation in Markdown. After executing it, run
+`python scripts/run_correlation_summary.py` to create the standalone comparison
+at `reports/clustering/correlation/correlation_comparison.html`.
+
+## Joint forecasting: fixed clusters and teammate handoff
+
+Start with [the main comparison notebook](notebooks/05_r2kmeans_methodology_audit.ipynb).
+For ready-to-try memberships, training counts and loader settings, use the
+generated [teammate quick start](reports/clustering/handoff/teammate_quickstart.md).
+The TA-requested priority is chronological evolution: continuous R2K monthly
+states, observed pair co-clustering in sliding 60-month windows, and an
+independent NumPy audit of Algorithm 2. R2K's 12-month feature lookback,
+centroid memory W=1/6/12 and five-year reporting window are distinct. Correlation
+references refit trailing 60-month return histories. All K=2–6 remain available.
+The interactive report now leads with this explorer; the earlier fixed-group
+comparison is collapsed as a handoff reference. Post-2019 temporal results are
+descriptive and do not establish neural forecast performance.
+
+It compares synchronous-return correlation, common-factor-adjusted returns,
+constrained DTW, level paths and frozen R2K moment groups. Static methods use the
+same 39 currencies and January 2011–December 2019 calendar; memberships freeze
+at that cutoff for later joint forecasts.
+
+```bash
+python -m pip install -e ".[clustering,reports,dev]"
+python scripts/build_clustering_handoff.py
+python -m pytest -q
+```
+
+One command exports the common numeric dataset, memberships, diagnostics,
+source/reference provenance, sequence counts and the
+[interactive HTML](reports/clustering/handoff/clustering_report.html),
+[Markdown](reports/clustering/handoff/clustering_report.md), and
+[PDF](reports/clustering/handoff/clustering_report.pdf) reports under
+`reports/clustering/handoff/`. The notebook verifies saved source/code/output
+hashes before reusing results, or invokes the same workflow. Generated data and
+reports remain local and outside version control. The HTML embeds Plotly once and
+works offline as a 3–5 minute findings brief: currency memberships, numerical
+correlation gaps, silhouettes/Jaccard scores, fixed-scale heatmaps and K profiles.
+Robustness and methodology are collapsed; the PCA/factor-reference analysis and
+full reproducibility detail stay in the PDF/Markdown reference. Its appendices
+include metric definitions, every method/K result and alternative memberships.
+Temporal exports include `evolution_labels.npz` (fixed currency axis; −1 for
+unavailable labels), monthly metrics, pair/currency summaries and initial-seed /
+annual five-year-restart sensitivity. Pair frequencies condition on joint
+eligibility. Summaries begin when all currencies can support 60-month returns;
+monthly coverage and lag-comparison denominators remain explicit.
+Conditional factor-reference ranges are exploratory, not significance tests or
+neural forecasting results.
+
+The reproducible default is adjusted-return average linkage, K=2 (25/14 currencies).
+Every compared K=2–6 is available, together with the all-39 K=1 control. K=3
+adjusted-average is the first grouped forecasting challenger against K=1;
+K=2 remains the stability control, with K=4 adjusted-Ward an additional candidate.
+K=2 is not an inferred true or forecast-optimal cluster count. Cluster selection does not remove the original
+FX changes or targets from the neural inputs. Group sizes, stability and data
+availability matter alongside separation. A stable complement can be internally
+heterogeneous: the 25-currency group has within-return correlation 0.448 versus
+0.442 outside, compared with 0.750 within the Europe-heavy group. Silhouettes
+across different
+representations are not a shared forecast-performance scale.
+
+The framework-neutral loader selects stable currency channels from one bundle:
+
+```python
+from pathlib import Path
+from fx_forecasting.data.neural_dataset import load_cluster_dataset
+
+batch = load_cluster_dataset(
+    Path("reports/clustering/handoff"), method="adjusted_average", k=2,
+    cluster=0, split="train", horizon=3, feature_view="macro",
+)
+print(batch.X_local.shape, batch.X_global.shape, batch.Y.shape)
+```
+
+Inputs have shapes `X_local[N,12,C,7]` and `X_global[N,12,3]`, with availability
+and carry masks; targets have `Y[N,C,H]` and a target mask. Currency IDs, input
+months, forecast origins and endpoints are explicit. Local features cover FX
+changes/volatility, REER gap and policy/inflation differentials. Common globals
+cover the lagged USD index and quarterly credit. Optional macro medians and
+feature scales fit only through December 2019; mandatory missing values remain
+masked placeholders. Targets extending beyond each split cutoff are masked and
+numerically zeroed.
+
+Defaults use validation 2020–2022 and test 2023–August 2026. Longer historical
+data are retained where sequences are eligible. For the recommended 25-currency
+group, only 79 complete training origins support the 12-month target; this is
+not thousands of independent neural examples. `sequence_counts.csv` reports
+each group, feature view, horizon and split. Credit/no-credit model comparisons
+must use intersected samples. Teammates choose and train their neural models.
+
+## Robust Rolling K-Means (optional paper reference)
+
+The earlier [scalar-routing audit](docs/r2kmeans_audit.md) is an optional historical
+appendix. Its Ridge models do not test synchronized multi-currency inputs or
+vector outputs, and do not restrict the joint-cluster forecasting goal.
+
+The [R2K-Means notebook](notebooks/04_robust_rolling_kmeans.ipynb) implements
+Algorithm 2 from Holmes, Hirsa, Klinkert and Malhotra (6 March 2024,
+[SSRN 4729393](https://ssrn.com/abstract=4729393)) and adapts it to the selected
+39-currency BIS roster. It includes synthetic examples, causal trailing FX
+features, monthly updates with persistent cluster IDs, rolling-centroid decision
+regions, independent/aligned K-Means baselines, and pre-2010 K/seed diagnostics.
+The core algorithm and experiment live in reusable package modules; the notebook
+explains their choices and displays the results.
+
+```bash
+python -m pip install -e ".[dev]"
+python scripts/run_r2kmeans.py --tune-k
+python scripts/run_r2kmeans_audit.py
+python -m pytest -q
+```
+
+Select that environment as the notebook kernel. The experiment reads the local
+ingested snapshot without downloads and saves labels, centroids, coverage,
+normalization, diagnostics and a provenance manifest under
+`reports/clustering/r2kmeans/`. The notebook adds figures and seed checks.
+This is an implementation of the grouping method and an FX adaptation, rather
+than a reproduction of the paper's mutual-fund results or a forecast-performance
+claim. See [implementation and timing notes](docs/r2kmeans.md) for the paper-to-code
+mapping, output schemas, limitations and incremental API.
 
 ## Data download script
 

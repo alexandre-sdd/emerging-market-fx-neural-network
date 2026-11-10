@@ -10,8 +10,16 @@ readme = "README.md"
 requires-python = ">=3.10"
 dynamic = ["dependencies"]
 
+[project.optional-dependencies]
+clustering = ["tslearn>=0.10,<0.11"]
+dev = ["pytest>=8", "nbclient>=0.10"]
+reports = ["reportlab>=4", "pypdfium2>=4"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
