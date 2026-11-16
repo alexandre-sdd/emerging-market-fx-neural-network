@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "purpose": "Exploratory BIS-only context prototype; economic arrangement/event features remain pending verification",
+  "fit_start": "2011-01",
+  "fit_end": "2019-12",
+  "validation_end": "2022-12",
+  "primary_window": 9,
+  "correlation_windows": [6, 9, 12, 18, 60],
+  "forecast_windows": [6, 9, 12, 18],
+  "return_views": ["raw", "median_adjusted"],
+  "primary_return_view": "raw",
+  "peer_method": "adjusted_average",
+  "peer_k": 3,
+  "minimum_peers": 2,
+  "minimum_threshold_months": 36,
+  "primary_horizon": 3,
+  "ridge_l2_grid": [0.001, 0.01, 0.1, 1.0],
+  "minimum_training_months": 36,
+  "seed": 42,
+  "limitations": [
+    "Revised BIS history and retrospective non-USD-peg sample restrictions",
+    "Evaluation periods have already been inspected; results are exploratory",
+    "Pooled currency-month Ridge screen, not joint neural forecasting",
+    "No verified arrangement, intervention, IMF, debt or political features yet"
+  ]
+}

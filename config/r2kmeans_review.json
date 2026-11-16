@@ -1,0 +1,45 @@
+{
+  "review_date": "2026-11-09",
+  "paper_version": "2024-03-06",
+  "status": "optional_historical_scalar_routing_audit",
+  "main_workflow": "scripts/build_clustering_handoff.py",
+  "user_goal": "Forecast multiple currencies jointly within fixed, training-fitted clusters",
+  "screen_scope": "Historical scalar Ridge models fitted to separately routed currency-month rows",
+  "screen_scope_exclusions": [
+    "Joint multivariate neural inputs and outputs",
+    "Neural minibatch ordering",
+    "Cluster or regime context used as an auxiliary model input"
+  ],
+  "membership_timing": {
+    "fixed_groups": "A grouping fitted entirely through a training cutoff may label that training history and remain frozen for later validation/test",
+    "dynamic_descriptors": "Use causal origin-time states over a fixed currency/channel axis",
+    "target_maturity": "Include a training target only if its endpoint is at or before the fit cutoff"
+  },
+  "paper_illustration": {
+    "k": 3,
+    "windows": [
+      1,
+      6,
+      12
+    ]
+  },
+  "historical_screen": {
+    "evaluation_start": "2010-01",
+    "horizons_months": [
+      1,
+      3,
+      12
+    ],
+    "ridge_mean_loss_l2": 1.0,
+    "minimum_group_training_rows": 120,
+    "minimum_group_training_months": 36,
+    "insufficient_group_action": "Explicit pooled-model fallback",
+    "interpretation": "Exploratory scalar-routing diagnostic; does not determine the joint forecasting design"
+  },
+  "reference_limitations": [
+    "Deterministic snapping does not imply universal unchanged-data invariance",
+    "Return/risk profile grouping differs from synchronous co-movement clustering",
+    "Squared-distance clustering remains sensitive to extremes and feature/scaling choices",
+    "Silhouette and turnover do not establish neural forecasting improvement"
+  ]
+}
