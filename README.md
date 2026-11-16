@@ -320,6 +320,32 @@ and dendrograms, with the interpretation in Markdown. After executing it, run
 `python scripts/run_correlation_summary.py` to create the standalone comparison
 at `reports/clustering/correlation/correlation_comparison.html`.
 
+## Economic context and changing currency relationships
+
+The [shared checklist](docs/clustering_todo.md) and
+[research plan](docs/clustering_exogenous_plan.md) organize the next feature work.
+The BIS-only prototype adds trailing return correlations and observed policy
+divergence to the canonical inputs, then compares matched pooled Ridge forecasts.
+It uses nine months as the primary correlation window, with 6/12/18-month and
+raw/median-adjusted sensitivities. These are exploratory historical comparisons.
+
+```bash
+python scripts/run_currency_context.py
+python scripts/analyze_chf_eur_episode.py
+```
+
+Results, offline HTML charts, numeric context exports and provenance are generated
+under `reports/clustering/context/`. The [CHF/EUR case study](docs/clustering_chf_eur_case_study.md)
+separates policy episodes from rolling-window memory. The
+[event ledger](docs/clustering_event_ledger.md) records selected CNY, DKK, MYR and CHF
+announcements with public/effective dates. These research records are separate
+from the currently tested forecast inputs.
+
+The [feature-study source audit](docs/data/feature_study_source_audit.md) recovers
+twenty published predictor descriptions from the team's RFE report. The full
+35-feature data matrix and generating notebook remain unavailable in the inspected
+source snapshot. Raw data and generated report outputs remain local.
+
 ## Joint forecasting: fixed clusters and teammate handoff
 
 Start with [the main comparison notebook](notebooks/05_r2kmeans_methodology_audit.ipynb).
@@ -330,8 +356,10 @@ states, observed pair co-clustering in sliding 60-month windows, and an
 independent NumPy audit of Algorithm 2. R2K's 12-month feature lookback,
 centroid memory W=1/6/12 and five-year reporting window are distinct. Correlation
 references refit trailing 60-month return histories. All K=2–6 remain available.
-The interactive report now leads with this explorer; the earlier fixed-group
-comparison is collapsed as a handoff reference. Post-2019 temporal results are
+The separate [temporal HTML](reports/clustering/handoff/clustering_evolution.html)
+leads with this explorer. The original
+[findings HTML](reports/clustering/handoff/clustering_report.html) retains its
+currency-group comparison and math dropdowns. Post-2019 temporal results are
 descriptive and do not establish neural forecast performance.
 
 It compares synchronous-return correlation, common-factor-adjusted returns,
@@ -347,13 +375,14 @@ python -m pytest -q
 
 One command exports the common numeric dataset, memberships, diagnostics,
 source/reference provenance, sequence counts and the
-[interactive HTML](reports/clustering/handoff/clustering_report.html),
+[findings HTML](reports/clustering/handoff/clustering_report.html),
+[temporal HTML](reports/clustering/handoff/clustering_evolution.html),
 [Markdown](reports/clustering/handoff/clustering_report.md), and
 [PDF](reports/clustering/handoff/clustering_report.pdf) reports under
 `reports/clustering/handoff/`. The notebook verifies saved source/code/output
 hashes before reusing results, or invokes the same workflow. Generated data and
-reports remain local and outside version control. The HTML embeds Plotly once and
-works offline as a 3–5 minute findings brief: currency memberships, numerical
+reports remain local and outside version control. Both HTML files work offline
+with one embedded Plotly bundle each. The original is a 3–5 minute findings brief: currency memberships, numerical
 correlation gaps, silhouettes/Jaccard scores, fixed-scale heatmaps and K profiles.
 Robustness and methodology are collapsed; the PCA/factor-reference analysis and
 full reproducibility detail stay in the PDF/Markdown reference. Its appendices

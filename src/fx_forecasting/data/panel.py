@@ -33,6 +33,36 @@ class FeaturePanel:
     global_provenance: pd.DataFrame
 
 
+def build_policy_divergence(panel: FeaturePanel, observations: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Observed policy changes at the panel's configured reference lag.
+
+    Unlike policy levels in the canonical panel, changes never use carried
+    observations. A three-month net differential change requires four observed
+    monthly levels for both countries. Rates and changes are percentage points.
+    Returns local (period, currency) and shared monthly numeric tables.
+    """
+    dates, currencies = panel.fx.index, panel.fx.columns
+    lag = panel.config["macro_availability"]["reference_lags_months"]["policy"]
+    if isinstance(lag, bool) or not isinstance(lag, int) or lag < 0:
+        raise ValueError("Policy reference lag must be a nonnegative integer")
+    domestic = pd.DataFrame(np.nan, index=dates, columns=currencies)
+    for entry in panel.config["currencies"]:
+        source = entry["source_series"]["policy"]
+        if source is not None:
+            values = _source(observations, "WS_CBPOL", source, dates)
+            domestic[entry["currency"]] = values.where(dates >= pd.Period(entry["first_eligible_month"], "M"))
+    us = _source(observations, "WS_CBPOL", "M:US", dates)
+    differential = domestic.sub(us, axis=0)
+    contiguous = differential.notna().rolling(4, min_periods=4).sum().eq(4)
+    local = _long({
+        "domestic_policy_change_1m": domestic.diff().shift(lag),
+        "rate_diff_change_3m": differential.diff(3).where(contiguous).shift(lag),
+    }, dates, currencies)
+    global_values = pd.DataFrame({"us_policy_change_1m": us.diff().shift(lag)}, index=dates)
+    global_values.index.name = "period"
+    return local, global_values
+
+
 def _source(obs: pd.DataFrame, dataset: str, source: str, calendar: pd.PeriodIndex) -> pd.Series:
     frequency = "Q" if calendar.freqstr.startswith("Q") else "M"
     selected = obs.loc[obs.dataset.eq(dataset) & obs.frequency.eq(frequency)

@@ -663,7 +663,7 @@ def _write_teammate_brief(folder: Path) -> list[str]:
               '## Make the comparison interpretable',
               'For the first comparison, intersect origins separately within each split across the pooled batch and every selected group; verify the same currency/horizon target cells are scored. Compare capacity/parameter budgets and use target masks. With the default macro-plus-credit inputs, the common training counts are 90/88/79 for 1/3/12-month horizons. Evaluate the extra available group history in a separate experiment, so history length is not confused with the value of grouping.',
               'Report per-currency and equal-currency aggregate errors in original FX units across seeds. Keep feature views and horizon choices matched. The 12-month validation horizon has only 24 matured origins, so limit tuning. The 2019 R2K snapshot is a fixed grouping; causal evolving R2K labels are a separate potential context input on the same fixed currency axis.',
-              'Canonical files: [memberships](groups.json), [all sequence counts](sequence_counts.csv), [dataset metadata](dataset_metadata.json), [source/config/code/output hashes](manifest.json), and [temporal explorer](clustering_report.html#evolution).']
+              'Canonical files: [memberships](groups.json), [all sequence counts](sequence_counts.csv), [dataset metadata](dataset_metadata.json), [source/config/code/output hashes](manifest.json), and [temporal explorer](clustering_evolution.html#evolution).']
     (folder/'teammate_quickstart.md').write_text('\n\n'.join(lines)+'\n')
     return ['teammate_quickstart.md']
 

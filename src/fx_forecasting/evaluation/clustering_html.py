@@ -87,13 +87,26 @@ def _evolution_html(data: dict) -> str:
 <section id="evolution"><div class="eyebrow">01 / TA REVIEW · OBSERVED HISTORICAL EVOLUTION</div><h2>Which currencies stay together through time?</h2>
 <p>R2K now runs continuously through the available monthly history. The five-year view counts how often a currency pair shares a group across <strong>60 actual monthly states</strong>. It uses no bootstrap and no artificial block joins. Monthly states begin {e['initialization']}; the 39-currency axis stays fixed, with gaps explicitly masked.</p>
 <div class="insights"><article><h3>Monthly continuity is not long-run persistence</h3><p>For R2K K=3, W=6, mean ARI is <strong>{default['mean_ari_1m']:.3f} versus the preceding month</strong>, but <strong>{default['mean_ari_12m']:.3f} versus twelve months earlier</strong>. Summaries cover {e['summary_start']}–{e['summary_end']}, starting when all 39 currencies can support a 60-month return window.</p></article><article><h3>Longer memory does not guarantee fewer switches</h3><p>At K=3, monthly ID-switch rates average <strong>{current['mean_switch_rate']:.1%} for W=1</strong> and <strong>{default['mean_switch_rate']:.1%} for W=6</strong>. These are observed membership changes, not forecast errors. W changes classification against recent centroids; it does not change their fitted path.</p></article></div>
-<div class="controls"><label><span>Method</span><select id="evolution-method">{methods}</select></label><label><span>Groups K</span><select id="evolution-k">{''.join(f'<option value="{k}"'+(' selected' if k==3 else '')+f'>{k}</option>' for k in e['k_values'])}</select></label><label><span>Five-year window endpoint</span><input id="evolution-end" type="range" min="59" max="{len(e['dates'])-1}" value="{len(e['dates'])-1}" step="1"></label></div>
+<div class="evolution-toolbar controls"><label><span>Method</span><select id="evolution-method">{methods}</select></label><label><span>Groups K</span><select id="evolution-k">{''.join(f'<option value="{k}"'+(' selected' if k==3 else '')+f'>{k}</option>' for k in e['k_values'])}</select></label><label><span>Focus currency</span><select id="evolution-currency">{currencies}</select></label><label><span>Window ends</span><input id="evolution-month" type="month" min="{e['dates'][59]}" max="{e['dates'][-1]}" value="{e['dates'][-1]}"></label></div>
+<div class="plot-panel evolution-workbench"><h3>Move the five-year window on the membership history</h3>
+<p class="caption">Drag the outlined window, or click a month to use it as the endpoint. Click a currency row to focus its relationships. Every selection stays exactly 60 calendar months.</p>
+<div id="evolution-timeline" class="chart" role="img" aria-label="Interactive monthly cluster history with a draggable five-year window"></div>
+<div class="evolution-timebar"><button id="evolution-prev-year" type="button" title="Move back twelve months">−1 year</button><button id="evolution-prev-month" type="button" title="Move back one month">← Month</button><label for="evolution-end" class="sr-only">Five-year window endpoint</label><input id="evolution-end" type="range" min="59" max="{len(e['dates'])-1}" value="{len(e['dates'])-1}" step="1"><button id="evolution-next-month" type="button" title="Move forward one month">Month →</button><button id="evolution-next-year" type="button" title="Move forward twelve months">+1 year</button><button id="evolution-latest" type="button">Latest</button></div>
 <p id="evolution-window" class="explorer-title" aria-live="polite"></p><p id="evolution-stats" class="selection-note"></p>
-<div class="plot-panel"><h3>Observed co-clustering during these five years</h3><div id="evolution-matrix" class="chart" role="img" aria-label="Five-year observed pair co-clustering frequencies"></div><p class="caption">White = never together; red = always together, conditional on joint eligibility. Hover shows the numerator and denominator. This is a historical fraction, not a probability of future membership. The currency order stays fixed as the window moves.</p></div>
-<div class="controls"><label><span>Inspect a currency’s companions</span><select id="evolution-currency">{currencies}</select></label></div>
-<div class="table-scroll"><table class="data-table"><thead><tr><th>Companion</th><th>Country / economy</th><th>Months together</th><th>Jointly eligible months</th><th>Fraction</th></tr></thead><tbody id="evolution-companions"></tbody></table></div>
-<details><summary>Monthly groups at this window’s endpoint</summary><div id="evolution-groups" class="group-grid"></div><p class="caption">R2K IDs follow its centroid paths. Correlation-refit IDs use maximum-overlap matching only for display. Pair frequencies do not depend on numeric group labels.</p></details>
-<div class="plot-panel"><h3>Monthly membership history</h3><div id="evolution-timeline" class="chart" role="img" aria-label="Chronological currency membership history"></div><p class="caption">The outlined interval is the selected five-year window. Blank cells are ineligible observations. Colors identify groups within this method/K, not fixed economic types across different settings.</p></div>
+<p class="caption">Colors are persistent group IDs within the selected method/K. Grey cells are missing observations. The chart keeps currencies in the same order as you move through time.</p></div>
+<div class="plot-panel"><h3 id="evolution-companion-title">Which currencies stay with the focus currency?</h3>
+<div class="controls"><label><span>Rank relationships by</span><select id="evolution-rank"><option value="closest">Closest companions</option><option value="gains">Biggest gains</option><option value="losses">Biggest losses</option></select></label><label><span>Minimum joint coverage (display filter)</span><select id="evolution-coverage"><option value="48">48 of 60 months</option><option value="60">All 60 months</option><option value="1">Any observed month</option></select></label></div>
+<p id="evolution-comparison" class="selection-note" aria-live="polite"></p>
+<div id="evolution-companion-chart" class="chart" role="img" aria-label="Ranked companion frequencies in selected and preceding five-year windows"></div>
+<div class="table-scroll"><table class="data-table"><thead><tr><th>Companion</th><th>Selected five years</th><th>Preceding five years</th><th>Change</th><th>Group at endpoint</th></tr></thead><tbody id="evolution-companions"></tbody></table></div>
+<p class="caption">Bars and percentages describe observed co-clustering, not return correlations. Changes are percentage points between two non-overlapping five-year windows. Insufficient coverage stays unavailable. Rankings require the displayed coverage threshold; gains/losses also require it in the preceding window.</p></div>
+<details><summary>Full pair matrix and group-level summary</summary>
+<div class="controls"><label><span>Matrix view</span><select id="evolution-matrix-view"><option value="frequency">Frequency together</option><option value="change">Change from preceding five years</option><option value="persistent">Persistent pairs (at least 80%)</option></select></label></div>
+<h3 id="evolution-matrix-title">Five-year co-clustering, ordered by endpoint group</h3><p id="evolution-matrix-note" class="caption"></p>
+<div class="table-scroll"><table id="evolution-blocks" class="data-table matrix-table" aria-label="Average pair frequencies or changes within and between endpoint groups"></table></div>
+<div id="evolution-matrix" class="chart" role="img" aria-label="Grouped currency-pair matrix with self-pairs and low-coverage pairs masked"></div>
+<p class="caption">Axes group currencies by their cluster at the selected endpoint; currently unassigned currencies appear last. This ordering aids interpretation and does not refit clusters. Diagonal self-pairs are hidden. Grey cells are unavailable, below coverage, or excluded by the persistent-pair filter; hover gives counts for observed cells.</p></details>
+<details><summary>Currency memberships at the selected endpoint</summary><div id="evolution-groups" class="group-grid"></div><p class="caption">R2K IDs follow its centroid paths. Correlation-refit IDs use maximum-overlap matching for display. Pair frequencies do not depend on numeric labels.</p></details>
 <details><summary>Three different windows, and the mathematical definition</summary><p><strong>Feature window:</strong> R2K uses 12 observed monthly returns to describe annualized FX change and volatility. <strong>Centroid memory W:</strong> current observations are labeled against the latest W monthly centroid states; the paper recommends roughly 6–12 increments. <strong>Reporting window:</strong> 60 monthly labels form the five-year co-clustering frequency.</p><p>For currencies i,j and endpoint t: <strong>frequency = eligible months with label(i) = label(j) / months when both labels are observed</strong>, over t−59,…,t. A missing pair never counts as a disagreement. Early windows can have fewer than 60 usable observations; their denominators remain visible.</p><p>The correlation alternatives genuinely refit on trailing 60-month return histories at each endpoint, requiring complete returns per included currency. R2K instead follows the paper’s continuous monthly update. These methods organize different objects: shared FX movements versus relative return/volatility states.</p><p>Adjacent five-year windows overlap by 59 months, so apparent smoothness is partly mechanical. Inspect 12- and 60-month partition agreement, coverage and group sizes. High co-clustering can also arise from one oversized group. A five-year restart is an initialization sensitivity, not the paper’s main update rule.</p></details>
 <p><strong>Scope:</strong> this is a descriptive study including post-2019 observations. It does not establish forecast improvement or provide an untouched forecasting holdout. Dynamic labels do not change the exported neural tensor’s currency identities.</p>
 <div class="links"><a class="download" href="evolution_metrics.csv">Monthly diagnostics ↓</a><a class="download" href="evolution_pairs.csv">Pair frequencies over the stated summary span ↓</a><a class="download" href="evolution_initialization.csv">Initialization / restart audit ↓</a></div></section>
@@ -113,6 +126,15 @@ EXTRA_CSS = """
 .data-table td{font-variant-numeric:tabular-nums}.data-table caption{caption-side:top;text-align:left;padding:12px;font-size:14px;font-weight:700;color:var(--ink)}.quality-table{min-width:770px}.quality-table small{white-space:nowrap}.data-table tr.selected-row td,.data-table tr.selected-row th{background:#e8f2f4;font-weight:700}.matrix-table th,.matrix-table td{text-align:center}.matrix-table td{font-size:15px;font-weight:700;padding:13px}
 details{border:1px solid var(--line);border-radius:7px;background:white;padding:16px 20px}summary{font-size:16px;color:var(--ink)}details p{font-size:14px}.skip-link{position:absolute;left:-9999px}.skip-link:focus{left:12px;top:10px;background:white;padding:10px;z-index:40}.error{padding:16px;background:#fff0e9;color:#8b3825}footer{letter-spacing:.3px;font-size:12px}
 @media(max-width:700px){main{padding:0 16px}.group-grid{grid-template-columns:1fr}nav{gap:20px;padding:12px 16px}section{padding:30px 0}header h1{letter-spacing:-1px}.plot-panel{padding:12px}.controls{padding:12px;align-items:stretch}.controls label{flex:1 1 130px}.controls select{width:100%;font-size:13px}.chart{overflow:hidden}summary{font-size:15px}}
+
+#evolution .evolution-toolbar{position:sticky;top:51px;z-index:16;background:#edf3f5f5;border:1px solid #ccdce2;box-shadow:0 3px 12px #20334312;gap:12px;padding:12px 16px}
+#evolution .evolution-toolbar label{flex:1 1 120px}#evolution .evolution-toolbar select{width:100%;font-size:13px}#evolution .evolution-toolbar label:first-child{flex:2 1 230px}
+#evolution input[type=month]{background:white;color:var(--ink);font:14px Arial,sans-serif;border:1px solid #aebfc9;border-radius:4px;padding:8px;max-width:170px}
+#evolution .evolution-timebar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#edf3f5;border-radius:5px;padding:12px;margin:8px 0}#evolution .evolution-timebar input[type=range]{flex:1 1 220px;min-width:160px;accent-color:var(--teal);cursor:ew-resize}
+#evolution button:disabled{opacity:.4;cursor:default}#evolution .evolution-workbench .chart{margin:8px 0}#evolution .plot-panel{margin:18px 0}#evolution .caption{max-width:none}#evolution .data-table small{font-size:11px;color:var(--muted)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:700px){#evolution .evolution-toolbar{position:static}#evolution .evolution-timebar button{padding:8px;font-size:12px}#evolution .evolution-timebar input[type=range]{order:5;flex-basis:100%}}
+
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}@media print{nav,.controls,button,.modebar{display:none!important}header{background:white;color:var(--ink);padding:20px 0}header .eyebrow,header .meta{color:var(--muted)}main{max-width:none}.plot-panel,details{break-inside:avoid}section{padding:20px 0}.chart{break-inside:avoid}.group-grid{grid-template-columns:1fr 1fr}}
 """
 
@@ -137,7 +159,7 @@ const visible=new Set(), plotted=new Set();
 function state(){return {method:byId('method').value,k:Number(byId('groups-k').value)};}
 function definition(){const s=state();return D.groups[`${s.method}:k${s.k}`];}
 function score(method,k){return scores.find(x=>x.method===method&&x.k===k);}
-function draw(id,data,layout){if(!visible.has(id))return;Plotly.react(id,data,{...base,...layout},config).then(()=>plotted.add(id)).catch(e=>{byId(id).classList.add('error');byId(id).textContent='Unable to draw this chart: '+e.message;});}
+function draw(id,data,layout,options={}){if(!visible.has(id))return Promise.resolve(false);return Plotly.react(id,data,{...base,...layout},{...config,...options}).then(()=>plotted.add(id)).catch(e=>{byId(id).classList.add('error');byId(id).textContent='Unable to draw this chart: '+e.message;});}
 function matrixCellColor(value,frequency){
  const palette=frequency?frequencyColors:correlationColors,x=Math.max(0,Math.min(1,frequency?value:(value+1)/2));
  const right=palette.findIndex(p=>p[0]>=x),hi=Math.max(1,right),a=palette[hi-1],b=palette[hi];
@@ -223,50 +245,123 @@ function summary(){
  byId('selection-note').textContent=`Fitted ${g.fit_start}–${g.fit_end}; frozen memberships. Overall silhouette ${fmt(v.silhouette)}; mean block ARI ${fmt(v.bootstrap_mean_ari)}. Group letters are specific to this method and K.`;
  byId('method-note').textContent=s.method.startsWith('r2k')?'R2K groups recent annual FX-change/volatility states. Its complete state history starts July 2011; the frozen December 2019 snapshot describes regimes, rather than synchronous co-movement.':s.method==='levels_average'?'Level correlation compares persistent FX paths. Trends can dominate: its large silhouette is not comparable with return-space silhouettes.':s.method==='dtw'?'DTW k-means compares standardized return shapes with up to two months of alignment. This differs from synchronous co-movement.':s.method.startsWith('adjusted')?'Subtract the monthly cross-currency median, then standardize each currency history. The grouping uses residuals; forecasts still target original FX changes.':'Standardized nominal return histories compare same-month FX/USD movements, including common dollar variation.';
 }
+function evolutionEndpoint(){return Math.max(59,Math.min(D.evolution.dates.length-1,Number(byId('evolution-end').value)));}
+function setEvolutionEndpoint(value){
+ const end=Math.max(59,Math.min(D.evolution.dates.length-1,Math.round(value)));
+ if(!Number.isFinite(end))return;
+ byId('evolution-end').value=String(end);evolution();
+}
+function monthPosition(value,snapBoundary=false){
+ const date=new Date(value instanceof Date?value:typeof value==='number'?value:String(value).slice(0,10));
+ if(Number.isNaN(date.getTime()))return null;
+ const first=D.evolution.dates[0].split('-').map(Number);
+ let position=(date.getUTCFullYear()-first[0])*12+date.getUTCMonth()-(first[1]-1);
+ // Plotly's pixel/date conversion can land just before a month boundary.
+ // Edges snap to the nearest boundary; clicks still select their observed month.
+ if(snapBoundary){const day=date.getUTCDate()-1,days=new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()+1,0)).getUTCDate();position+=Math.round(day/days);}
+ return position;
+}
+function handleEvolutionRelayout(event){
+ if(!D.evolution||!Object.keys(event).some(key=>key==='shapes'||key.startsWith('shapes[0]')))return;
+ const shape=event.shapes&&event.shapes[0];
+ const right=event['shapes[0].x1']??shape?.x1,left=event['shapes[0].x0']??shape?.x0;
+ const position=monthPosition(right??left,true);
+ // x1 is the first day AFTER the last selected month; dragging an edge snaps
+ // back to a fixed 60-month interval. Vertical resizing never changes membership.
+ setEvolutionEndpoint(position==null?evolutionEndpoint():position+(right!=null?-1:59));
+}
+function handleEvolutionClick(event){
+ const point=event.points&&event.points[0];if(!point)return;
+ if(D.evolution.currencies.includes(point.y))byId('evolution-currency').value=point.y;
+ const position=monthPosition(point.x);if(position!=null)setEvolutionEndpoint(position);
+}
+function evolutionCounts(path,start,end){
+ const n=path[0].length,num=Array.from({length:n},()=>Array(n).fill(0)),den=num.map(row=>row.slice());
+ if(start<0)return {num,den};
+ for(let t=start;t<=end;t++)for(let i=0;i<n;i++)if(path[t][i]>=0)for(let j=0;j<n;j++)if(path[t][j]>=0){den[i][j]++;num[i][j]+=path[t][i]===path[t][j]?1:0;}
+ return {num,den};
+}
 function evolution(){
  if(!D.evolution)return;
- const e=D.evolution,method=byId('evolution-method').value,k=Number(byId('evolution-k').value),end=Number(byId('evolution-end').value),start=end-59;
- const path=e.labels[`${method}:k${k}`],cs=e.currencies,n=cs.length,den=Array.from({length:n},()=>Array(n).fill(0)),num=den.map(r=>r.slice());
- for(let t=start;t<=end;t++)for(let i=0;i<n;i++)if(path[t][i]>=0)for(let j=0;j<n;j++)if(path[t][j]>=0){den[i][j]++;num[i][j]+=path[t][i]===path[t][j]?1:0;}
- const frequency=num.map((row,i)=>row.map((v,j)=>den[i][j]?v/den[i][j]:null)),pairs=[];
- for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)if(den[i][j])pairs.push(frequency[i][j]);pairs.sort((a,b)=>a-b);
+ const e=D.evolution,method=byId('evolution-method').value,k=Number(byId('evolution-k').value),end=evolutionEndpoint(),start=end-59;
+ byId('evolution-month').value=e.dates[end];
+ for(const id of ['evolution-prev-year','evolution-prev-month'])byId(id).disabled=end===59;
+ for(const id of ['evolution-next-year','evolution-next-month','evolution-latest'])byId(id).disabled=end===e.dates.length-1;
+ const path=e.labels[`${method}:k${k}`],cs=e.currencies,n=cs.length,minimum=Number(byId('evolution-coverage').value)||48;
+ const {num,den}=evolutionCounts(path,start,end),previous=evolutionCounts(path,start-60,start-1);
+ const frequency=num.map((row,i)=>row.map((v,j)=>den[i][j]?v/den[i][j]:null));
+ const old=previous.num.map((row,i)=>row.map((v,j)=>previous.den[i][j]?v/previous.den[i][j]:null));
+ const delta=frequency.map((row,i)=>row.map((v,j)=>v!=null&&old[i][j]!=null&&den[i][j]>=minimum&&previous.den[i][j]>=minimum?v-old[i][j]:null));
  const groups=Array.from({length:k},(_,cluster)=>({cluster,currencies:cs.filter((c,i)=>path[end][i]===cluster)})).filter(g=>g.currencies.length);
- byId('evolution-window').textContent=`${e.names[method]} · K=${k} · ${e.dates[start]}–${e.dates[end]} (60 calendar months)`;
- const median=pairs.length?(pairs[Math.floor((pairs.length-1)/2)]+pairs[Math.ceil((pairs.length-1)/2)])/2:null;
- byId('evolution-stats').textContent=`Endpoint group sizes: ${groups.map(g=>g.currencies.length).join(' / ')}; ${path[end].filter(x=>x>=0).length}/39 eligible currencies. Median observed pair frequency: ${fmt(median)}. High frequencies may reflect a large catch-all group; inspect membership sizes as well.`;
+ byId('evolution-window').textContent=`${e.names[method]} · K=${k} · ${e.dates[start]}–${e.dates[end]} · 60 calendar months`;
+ const eligible=[];for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)if(den[i][j]>=minimum)eligible.push(frequency[i][j]);
+ byId('evolution-stats').textContent=`Endpoint group sizes: ${groups.map(g=>g.currencies.length).join(' / ')}; ${path[end].filter(x=>x>=0).length}/${n} currencies assigned. ${eligible.length}/${n*(n-1)/2} pairs meet ${minimum}-month coverage; ${eligible.filter(x=>x>=.8).length} are together at least 80% of the time. A large group can inflate these fractions.`;
  byId('evolution-groups').innerHTML=currencyCards(groups);
- draw('evolution-matrix',[{type:'heatmap',z:frequency,x:cs,y:cs,zmin:0,zmax:1,zauto:false,colorscale:frequencyColors,
- customdata:num.map((row,i)=>row.map((v,j)=>[v,den[i][j]])),colorbar:{title:{text:'Fraction together'},tickvals:[0,.25,.5,.75,1],thickness:20},
- hovertemplate:'%{y} × %{x}<br>Together %{customdata[0]} / %{customdata[1]} eligible months<br>Fraction %{z:.3f}<extra></extra>'}],
- {height:Math.max(400,Math.min(650,byId('evolution-matrix').clientWidth*.8)),margin:{l:52,r:100,t:12,b:60},xaxis:{tickangle:-90,tickfont:{size:9},fixedrange:true},yaxis:{autorange:'reversed',tickfont:{size:9},fixedrange:true}});
- const focus=cs.indexOf(byId('evolution-currency').value);
- const companions=cs.map((c,j)=>({c,j,f:frequency[focus][j],n:den[focus][j],same:num[focus][j]})).filter(x=>x.j!==focus&&x.n).sort((a,b)=>b.f-a.f||b.n-a.n||a.c.localeCompare(b.c)).slice(0,10);
- byId('evolution-companions').innerHTML=companions.map(x=>`<tr><td>${x.c}</td><td>${htmlEscape(D.countryNames[x.c])}</td><td>${x.same}</td><td>${x.n}</td><td>${fmt(x.f)}</td></tr>`).join('')||'<tr><td colspan="5">No jointly eligible observations in this window.</td></tr>';
- const timeline=cs.map((c,i)=>path.map(row=>row[i]<0?null:row[i]));
- const palette=colors.slice(0,k).flatMap((c,i)=>[[i/k,c],[(i+1)/k,c]]);
- draw('evolution-timeline',[{type:'heatmap',z:timeline,x:e.dates,y:cs,zmin:-.5,zmax:k-.5,zauto:false,colorscale:palette,
- colorbar:{title:{text:'Group ID'},tickvals:Array.from({length:k},(_,i)=>i),ticktext:Array.from({length:k},(_,i)=>letter(i)),thickness:20},
- hovertemplate:'%{y} · %{x}<br>Group ID %{z}<extra></extra>'}],{height:650,margin:{l:52,r:90,t:10,b:50},
- xaxis:{type:'date',fixedrange:true},yaxis:{autorange:'reversed',tickfont:{size:9},fixedrange:true},
- shapes:[{type:'rect',xref:'x',yref:'paper',x0:e.dates[start],x1:e.dates[end],y0:0,y1:1,fillcolor:'rgba(255,255,255,.18)',line:{color:'#203343',width:2}}]});
+ let focus=cs.indexOf(byId('evolution-currency').value);if(focus<0)focus=0;
+ const focusCode=cs[focus],rank=byId('evolution-rank').value;
+ const companions=cs.map((c,j)=>({c,j,f:frequency[focus][j],n:den[focus][j],same:num[focus][j],old:old[focus][j],oldN:previous.den[focus][j],oldSame:previous.num[focus][j],delta:delta[focus][j]}))
+ .filter(x=>x.j!==focus&&x.n>=minimum&&(rank==='closest'||x.delta!=null))
+ .sort((a,b)=>(rank==='gains'?b.delta-a.delta:rank==='losses'?a.delta-b.delta:b.f-a.f)||b.n-a.n||a.c.localeCompare(b.c)).slice(0,10);
+ const percent=value=>value==null?'—':`${(value*100).toFixed(0)}%`,pp=value=>value==null?'—':`${value>0?'+':''}${(value*100).toFixed(0)} pp`;
+ byId('evolution-companion-title').textContent=`${focusCode} · ${D.countryNames[focusCode]}: ${rank==='gains'?'biggest co-clustering gains':rank==='losses'?'biggest co-clustering losses':'closest companions'}`;
+ byId('evolution-comparison').textContent=start>=60?`Selected: ${e.dates[start]}–${e.dates[end]}. Preceding comparison: ${e.dates[start-60]}–${e.dates[start-1]}. ${companions.length} relationships shown; minimum ${minimum}/60 jointly observed months.`:'The selected window has no complete preceding five-year interval. Previous-window bars and changes remain unavailable.';
+ byId('evolution-companions').innerHTML=companions.map(x=>`<tr><td><strong>${x.c}</strong><br><small>${htmlEscape(D.countryNames[x.c])}</small></td><td>${percent(x.f)}<br><small>${x.same}/${x.n} months</small></td><td>${x.oldN>=minimum?percent(x.old):'Unavailable'}<br><small>${x.oldSame}/${x.oldN} months</small></td><td>${pp(x.delta)}</td><td>${path[end][x.j]>=0?'Group '+letter(path[end][x.j]):'Unassigned'}</td></tr>`).join('')||'<tr><td colspan="5">No pairs meet this coverage / comparison filter. Select another window or lower the display threshold.</td></tr>';
+ draw('evolution-companion-chart',[
+ {type:'bar',orientation:'h',name:'Selected five years',y:companions.map(x=>x.c),x:companions.map(x=>x.f),marker:{color:'#176b80'},customdata:companions.map(x=>[x.same,x.n,D.countryNames[x.c]]),hovertemplate:'%{y} · %{customdata[2]}<br>Selected: %{x:.1%}<br>%{customdata[0]}/%{customdata[1]} months<extra></extra>'},
+ {type:'bar',orientation:'h',name:'Preceding five years',y:companions.map(x=>x.c),x:companions.map(x=>x.oldN>=minimum?x.old:null),marker:{color:'#c4cdd3'},customdata:companions.map(x=>[x.oldSame,x.oldN]),hovertemplate:'%{y}<br>Preceding: %{x:.1%}<br>%{customdata[0]}/%{customdata[1]} months<extra></extra>'}],
+ {height:Math.max(260,companions.length*35+90),barmode:'group',showlegend:true,margin:{l:50,r:25,t:10,b:65},xaxis:{range:[0,1],tickformat:'.0%',title:{text:'Observed fraction of eligible months together'},fixedrange:true},yaxis:{autorange:'reversed',fixedrange:true},legend:{orientation:'h',y:-.18},annotations:companions.length?[]:[{text:'No eligible relationships for this selection',xref:'paper',yref:'paper',x:.5,y:.5,showarrow:false}]});
+ // The detailed matrix is ordered by current group, while timeline row identities stay fixed.
+ const order=groups.flatMap(g=>g.currencies).concat(cs.filter((c,i)=>path[end][i]<0)),indices=order.map(c=>cs.indexOf(c)),mode=byId('evolution-matrix-view').value,isChange=mode==='change';
+ const cell=(i,j)=>i===j||den[i][j]<minimum?null:isChange?delta[i][j]:mode==='persistent'&&frequency[i][j]<.8?null:frequency[i][j];
+ const z=indices.map(i=>indices.map(j=>cell(i,j))),custom=indices.map(i=>indices.map(j=>[num[i][j],den[i][j],previous.num[i][j],previous.den[i][j],percent(frequency[i][j]),percent(old[i][j]),pp(delta[i][j])]));
+ byId('evolution-matrix-title').textContent=isChange?'Change in pair co-clustering versus the preceding five years':'Pair co-clustering, grouped by endpoint membership';
+ byId('evolution-matrix-note').textContent=isChange?'Fixed scale: −100 pp blue · 0 white · +100 pp red. Positive cells became more frequently grouped together. Grey means unavailable.':'Fixed scale: 0 white · 100% red. Self-pairs and low-coverage pairs are hidden; persistent-pair mode additionally hides fractions below 80%.';
+ let html='<caption>Average across displayed pairs in endpoint groups · '+(isChange?'change in percentage points':'fraction together')+'</caption><thead><tr><th>Endpoint groups</th>'+groups.map(g=>`<th>${letter(g.cluster)} · ${g.currencies.length} FX</th>`).join('')+'</tr></thead><tbody>';
+ groups.forEach((g,i)=>{html+=`<tr><th>${letter(g.cluster)} · ${g.currencies.length} FX</th>`;groups.forEach((h,j)=>{const vals=[];g.currencies.forEach(a=>h.currencies.forEach(b=>{const v=cell(cs.indexOf(a),cs.indexOf(b));if(v!=null&&(i!==j||a<b))vals.push(v);}));const v=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;html+=v==null?'<td>N/A</td>':`<td style="${matrixCellColor(v,!isChange)}" title="Mean over ${vals.length} observed pairs">${isChange?pp(v):percent(v)}</td>`;});html+='</tr>';});byId('evolution-blocks').innerHTML=html+'</tbody>';
+ let offset=0;const boundaries=[];groups.forEach((g,i)=>{offset+=g.currencies.length;if(offset<n)for(const axis of ['x','y'])boundaries.push(axis==='x'?{type:'line',x0:offset-.5,x1:offset-.5,y0:-.5,y1:n-.5}:{type:'line',y0:offset-.5,y1:offset-.5,x0:-.5,x1:n-.5});});
+ draw('evolution-matrix',[{type:'heatmap',z,x:order,y:order,zmin:isChange?-1:0,zmax:1,zauto:false,colorscale:isChange?correlationColors:frequencyColors,customdata:custom,hoverongaps:false,
+ colorbar:{title:{text:isChange?'Change':'Together'},tickvals:isChange?[-1,-.5,0,.5,1]:[0,.25,.5,.75,1],ticktext:isChange?['−100 pp','−50 pp','0','+50 pp','+100 pp']:['0','25%','50%','75%','100%'],thickness:20},
+ hovertemplate:'%{y} × %{x}<br>Selected: %{customdata[4]} (%{customdata[0]}/%{customdata[1]})<br>Preceding: %{customdata[5]} (%{customdata[2]}/%{customdata[3]})<br>Change: %{customdata[6]}<extra></extra>'}],
+ {height:Math.max(400,Math.min(650,byId('evolution-matrix').clientWidth*.8)),plot_bgcolor:'#e2e6e9',margin:{l:52,r:100,t:12,b:60},xaxis:{tickangle:-90,tickfont:{size:10},fixedrange:true},yaxis:{autorange:'reversed',tickfont:{size:10},fixedrange:true},shapes:boundaries.map(x=>({...x,line:{color:'#203343',width:1.5}}))});
+ const timeline=cs.map((c,i)=>path.map(row=>row[i]<0?null:row[i])),palette=colors.slice(0,k).flatMap((c,i)=>[[i/k,c],[(i+1)/k,c]]);
+ const finish=new Date(e.dates[end]+'-01T00:00:00Z');finish.setUTCMonth(finish.getUTCMonth()+1);
+ const final=new Date(e.dates.at(-1)+'-01T00:00:00Z');final.setUTCMonth(final.getUTCMonth()+1);
+ draw('evolution-timeline',[{type:'heatmap',z:timeline,x:e.dates,y:cs,zmin:-.5,zmax:k-.5,zauto:false,colorscale:palette,hoverongaps:false,
+ colorbar:{title:{text:'Group'},tickvals:Array.from({length:k},(_,i)=>i),ticktext:Array.from({length:k},(_,i)=>letter(i)),thickness:18},
+ customdata:cs.map(c=>e.dates.map(()=>D.countryNames[c])),hovertemplate:'%{y} · %{customdata}<br>%{x}<br>Group ID %{z}<extra></extra>'}],
+ {height:Math.max(430,Math.min(580,(window.innerHeight||850)*.58)),plot_bgcolor:'#e2e6e9',margin:{l:52,r:75,t:10,b:40},dragmode:false,
+ xaxis:{type:'date',range:[e.dates[0],final.toISOString().slice(0,10)],fixedrange:true},yaxis:{autorange:'reversed',tickfont:{size:10},tickvals:cs,ticktext:cs.map(c=>c===focusCode?'<b>'+c+'</b>':c),fixedrange:true},
+ shapes:[{type:'rect',xref:'x',yref:'paper',x0:e.dates[start],x1:finish.toISOString().slice(0,10),y0:0,y1:1,fillcolor:'rgba(255,255,255,.15)',line:{color:'#172e3d',width:3},editable:true}]},
+ {edits:{shapePosition:true},displayModeBar:false}).then(()=>{
+  const chart=byId('evolution-timeline');if(!chart.on||chart._evolutionEventsBound)return;
+  chart.on('plotly_relayout',handleEvolutionRelayout);chart.on('plotly_click',handleEvolutionClick);chart._evolutionEventsBound=true;
+ });
 }
+
 function update(){summary();heatmap();kEvidence();evidence();}
-if(D.evolution){['evolution-method','evolution-k','evolution-currency'].forEach(id=>byId(id).addEventListener('change',evolution));byId('evolution-end').addEventListener('input',evolution);byId('show-fixed-reference').addEventListener('click',()=>{byId('fixed-reference').open=true;});}
+if(D.evolution){
+ ['evolution-method','evolution-k','evolution-currency','evolution-rank','evolution-coverage','evolution-matrix-view'].forEach(id=>byId(id).addEventListener('change',evolution));
+ byId('evolution-end').addEventListener('input',evolution);
+ byId('evolution-month').addEventListener('change',()=>{const position=monthPosition(byId('evolution-month').value);if(position!=null)setEvolutionEndpoint(position);else evolution();});
+ for(const [id,step]of [['prev-year',-12],['prev-month',-1],['next-month',1],['next-year',12]])byId('evolution-'+id).addEventListener('click',()=>setEvolutionEndpoint(evolutionEndpoint()+step));
+ byId('evolution-latest').addEventListener('click',()=>setEvolutionEndpoint(D.evolution.dates.length-1));
+ byId('show-fixed-reference').addEventListener('click',()=>{byId('fixed-reference').open=true;});
+}
 ['method','groups-k','references','matrix-view'].forEach(id=>byId(id).addEventListener('change',update));
 function select(method,k){byId('method').value=method;byId('groups-k').value=String(k);update();}
 byId('reset').addEventListener('click',()=>{byId('matrix-view').value='original';byId('references').checked=false;select('adjusted_average',2);});
 byId('try-k3').addEventListener('click',()=>select('adjusted_average',3));
 byId('try-ward4').addEventListener('click',()=>select('adjusted_ward',4));
 const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){visible.add(entry.target.id);if(entry.target.id==='correlation-chart')heatmap();else if(entry.target.id==='k-chart')kEvidence();else if(entry.target.id.startsWith('evolution-'))evolution();else evidence();observer.unobserve(entry.target);}}},{rootMargin:'200px'});
-['correlation-chart','k-chart','stability-chart',...(D.evolution?['evolution-matrix','evolution-timeline']:[])].forEach(id=>observer.observe(byId(id)));
+['correlation-chart','k-chart','stability-chart',...(D.evolution?['evolution-timeline','evolution-companion-chart','evolution-matrix']:[])].forEach(id=>observer.observe(byId(id)));
 let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{heatmap();evolution();for(const id of plotted)Plotly.Plots.resize(id);},180);});
 update();evolution();
 
 """
 
 
-def write_clustering_html(output_dir: Path) -> list[str]:
-    """Write the findings brief with compact explanations; full detail is in PDF/MD."""
+def write_clustering_html(output_dir: Path, *, temporal_only: bool = False) -> list[str]:
+    """Keep the original findings brief and temporal analysis as separate HTML files."""
     from plotly.offline import get_plotlyjs
 
     folder = Path(output_dir)
@@ -282,18 +377,7 @@ def write_clustering_html(output_dir: Path) -> list[str]:
     )
     methods = ''.join(f'<option value="{escape(m)}"'+(' selected' if m == 'adjusted_average' else '')+
                       f'>{escape(name)}</option>' for m, name in data['names'].items())
-    evolution_content = _evolution_html(data)
-    payload = json.dumps(data, separators=(",", ":"), allow_nan=False).replace("</", "<\\/")
-    content = f"""
-<a class="skip-link" href="#findings">Skip to findings</a>
-<header><div class="eyebrow">COLUMBIA · DEEP LEARNING · FINDINGS BRIEF</div>
-<h1>Currency clusters<br>through time</h1>
-<p class="lede">Five-year co-clustering histories, a paper-level R2K audit, and the implications for joint FX forecasting.</p>
-<div class="meta">3–5 minute read · Technical business stakeholders &amp; deep learning TA · 10 November 2026</div></header>
-<nav aria-label="Report sections"><a href="#evolution">Five-year evolution</a><a href="#paper-audit">R2K audit</a><a id="show-fixed-reference" href="#fixed-reference">Fixed-group handoff</a><a href="clustering_report.pdf">Detailed PDF</a></nav>
-<main>
-{evolution_content}
-<details id="fixed-reference"><summary>Earlier fixed-group comparison and neural handoff</summary>
+    fixed_sections = f"""
 <section id="findings"><div class="eyebrow">01 / THE RESULT</div><h2>Stable groups, uneven separation.</h2>
 <p>We compared eight approaches at K=2–6 on 39 currencies, using 2011–2019 training data. The saved baseline is median-adjusted return correlation with average linkage, K=2: <strong>25 and 14 currencies</strong>. Its mean block-resample agreement is <strong>0.784</strong>, but silhouette is only <strong>0.175</strong>. Membership is more convincing than sharp separation.</p>
 <details id="block-agreement-math" class="math-explainer"><summary>How is block-resample agreement calculated?</summary>
@@ -343,15 +427,44 @@ def write_clustering_html(output_dir: Path) -> list[str]:
 <p>The handoff already provides fixed channels, 12-month inputs, 1/3/12-month targets and masks. Validation is 2020–2022; test is 2023–August 2026. Teammates still need to train the networks and compare per-currency forecast errors. Revised data, retrospective regime exclusions and overlapping samples limit inference.</p>
 <div class="links"><a class="download" href="clustering_report.pdf">Full technical reference ↗</a><a class="download" href="clustering_report.md">Markdown source ↗</a><a class="download" href="groups.json">Memberships ↗</a><a class="download" href="sequence_counts.csv" download>All eligibility counts ↓</a><a class="download" href="manifest.json">Sources &amp; hashes ↗</a></div>
 </section>
-</details>
-<noscript><aside>Enable JavaScript to explore memberships and charts. The findings above and the linked PDF/CSV results remain available.</aside></noscript>
-</main><footer>Clustering diagnostics describe shared movement and stability. Neural forecasting improvement remains untested.</footer>
 """
-    # One embedded Plotly bundle; no CDNs, webfonts, fetch calls or server required.
-    document = ('<!doctype html><html lang="en"><head><meta charset="utf-8">'
-                '<meta name="viewport" content="width=device-width,initial-scale=1">'
-                '<title>Currency groups | findings brief</title><style>'+CSS+EXTRA_CSS+
-                '</style></head><body>'+content+'<script type="application/json" id="clustering-data">'+payload+
-                '</script><script>'+get_plotlyjs()+'</script><script>'+RUNTIME+'</script></body></html>')
-    (folder/"clustering_report.html").write_text(document)
-    return ["clustering_report.html"]
+    footer = '<footer>Clustering diagnostics describe shared movement and stability. Neural forecasting improvement remains untested.</footer>'
+    noscript = '<noscript><aside>Enable JavaScript to explore memberships and charts. The findings and linked PDF/CSV results remain available.</aside></noscript>'
+    findings_content = f"""
+<a class="skip-link" href="#findings">Skip to findings</a>
+<header><div class="eyebrow">COLUMBIA · DEEP LEARNING · FINDINGS BRIEF</div>
+<h1>Currency groups:<br>what did we find?</h1>
+<p class="lede">A coherent Europe-heavy block, a heterogeneous remainder, and no demonstrated forecasting gain yet.</p>
+<div class="meta">3–5 minute read · Technical business stakeholders &amp; deep learning TA · 10 November 2026</div></header>
+<nav aria-label="Report sections"><a href="#findings">Findings</a><a href="#groups">Currencies &amp; heatmaps</a><a href="#evidence">K &amp; robustness</a><a href="#next">Project implication</a><a href="clustering_evolution.html">Temporal analysis ↗</a></nav>
+<main>{fixed_sections}{noscript}</main>{footer}
+"""
+    temporal_content = f"""
+<a class="skip-link" href="#evolution">Skip to temporal findings</a>
+<header><div class="eyebrow">COLUMBIA · DEEP LEARNING · TEMPORAL ANALYSIS</div>
+<h1>Currency clusters<br>through time</h1>
+<p class="lede">Five-year co-clustering histories, a paper-level R2K audit, and the implications for joint FX forecasting.</p>
+<div class="meta">Technical business stakeholders &amp; deep learning TA · 10 November 2026</div></header>
+<nav aria-label="Report sections"><a href="#evolution">Five-year evolution</a><a href="#paper-audit">R2K audit</a><a href="clustering_report.html">Original findings ↗</a><a id="show-fixed-reference" href="#fixed-reference">Fixed-group handoff</a><a href="clustering_report.pdf">Detailed PDF</a></nav>
+<main>{_evolution_html(data)}
+<details id="fixed-reference"><summary>Earlier fixed-group comparison and neural handoff</summary>{fixed_sections}</details>
+{noscript}</main>{footer}
+"""
+    # Both files are standalone and share one renderer/runtime; only the temporal
+    # version embeds the additional monthly histories and enables its controls.
+    plotly_js = get_plotlyjs()
+    views = [] if temporal_only else [("clustering_report.html", "Currency groups | findings brief", findings_content, False)]
+    if data.get("evolution"):
+        views.append(("clustering_evolution.html", "Currency clusters | temporal analysis", temporal_content, True))
+    produced = []
+    for filename, title, content, temporal in views:
+        view_data = {**data, "evolution": data["evolution"] if temporal else None}
+        payload = json.dumps(view_data, separators=(",", ":"), allow_nan=False).replace("</", "<\\/")
+        document = ('<!doctype html><html lang="en"><head><meta charset="utf-8">'
+                    '<meta name="viewport" content="width=device-width,initial-scale=1">'
+                    '<title>'+title+'</title><style>'+CSS+EXTRA_CSS+
+                    '</style></head><body>'+content+'<script type="application/json" id="clustering-data">'+payload+
+                    '</script><script>'+plotly_js+'</script><script>'+RUNTIME+'</script></body></html>')
+        (folder/filename).write_text(document)
+        produced.append(filename)
+    return produced
